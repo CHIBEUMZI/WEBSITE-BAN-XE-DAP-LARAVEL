@@ -25,7 +25,7 @@
             <h4 class="text-blue-600 text-xl font-semibold mb-2">Đơn hàng #{{ $order->id }} - {{ $order->order_date->format('d/m/Y') }}</h4>
             <p class="text-gray-700 mb-1">Trạng thái: {{ $order->status }}</p>
             <p class="text-gray-700 mb-3">Tổng tiền: {{ number_format($order->total_amount, 0, ',', '.') }} VND</p>
-            <a href="{{ route('client.orders.show', $order->id) }}" class="inline-block bg-blue-600 text-white px-5 py-2 rounded-md font-semibold hover:bg-blue-700 transition-colors duration-300">
+            <a href="{{ route('client.orders.show', $order->id) }}" class="no-underline inline-block bg-blue-600 text-white px-5 py-2 rounded-md font-semibold hover:bg-blue-700 transition-colors duration-300">
               Chi tiết
             </a>
           </div>

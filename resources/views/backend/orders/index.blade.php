@@ -34,7 +34,7 @@
                                     @csrf
                                     <input type="hidden" name="action" value="delivered">
                                     <button type="submit" class="btn btn-primary btn-sm"
-                                        onclick="return confirm('Bạn có chắc muốn nâng cấp tài khoản này lên Admin không?')">
+                                        onclick="return confirm('Bạn có chắc muốn xác nhận giao đơn hàng này?')">
                                         Xác nhận giao
                                     </button>
                                 </form>
@@ -43,7 +43,7 @@
                                     @csrf
                                     <input type="hidden" name="action" value="cancel">
                                     <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Bạn có chắc muốn hạ cấp tài khoản này xuống User không?')">
+                                        onclick="return confirm('Bạn có chắc muốn xác nhận hủy đơn hàng này không?')">
                                         Xác nhận hủy
                                     </button>
                                 </form>

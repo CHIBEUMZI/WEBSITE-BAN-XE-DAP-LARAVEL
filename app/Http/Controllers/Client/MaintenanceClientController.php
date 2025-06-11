@@ -58,11 +58,16 @@ class MaintenanceClientController extends Controller
 
     public function show()
     {
-        $maintenance = Maintenance::with(['product', 'employee'])
+        $maintenances = Maintenance::with(['product', 'employee'])
                         ->where('user_id', Auth::id()) 
-                        ->firstOrFail();
+                        ->get();
 
-        return view('client.maintenance.show', compact('maintenance'));
+        return view('client.maintenance.show', compact('maintenances'));
     }
 
+    public function details($id)
+    {
+        $maintenance = Maintenance::findOrFail($id);
+        return view('client.maintenance.detail', compact('maintenance'));
+    }
 }

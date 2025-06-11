@@ -16,14 +16,28 @@
 
  <main class="container mx-auto px-4 py-8 flex-grow">
   <h2 class="text-3xl font-semibold text-blue-700 mb-6 border-b-2 border-blue-400 pb-2">
-    Danh sách yêu cầu bảo trì của bạn
+    Yêu cầu bảo trì
   </h2>
+        <div class="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto mb-6">
+      <!-- Thông tin khách hàng -->
+      <section class="mb-4">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-300 pb-2">Thông tin khách hàng</h3>
+        <p><span class="font-semibold">Tên:</span> {{ $maintenance->customer_name }}</p>
+        <p><span class="font-semibold">Số điện thoại:</span> {{ $maintenance->phone }}</p>
+        <p><span class="font-semibold">Email:</span> {{ $maintenance->email }}</p>
+        <p><span class="font-semibold">Địa chỉ:</span> {{ $maintenance->address }}</p>
+      </section>
 
-  @forelse ($maintenances as $maintenance)
-    <div class="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto mb-6">
+      <!-- Thông tin sản phẩm -->
+      <section class="mb-4">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-300 pb-2">Thông tin sản phẩm</h3>
+        <p><span class="font-semibold">Sản phẩm:</span> {{ $maintenance->product->name ?? 'Không có thông tin' }}</p>
+        <p><span class="font-semibold">Mã SKU:</span> {{ $maintenance->product_sku }}</p>
+      </section>
+
       <!-- Thông tin bảo trì -->
       <section class="mb-4">
-        
+        {{-- <a href="{{route('product.processBuy' , ['id' => $maintenance->id]) }}">Xem chi tiết</a> --}}
         <h3 class="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-300 pb-2">Thông tin bảo trì</h3>
         <p><span class="font-semibold">Mô tả sự cố:</span> {{ $maintenance->issue_description }}</p>
         <p><span class="font-semibold">Ngày mong muốn:</span> {{ $maintenance->preferred_date ? $maintenance->preferred_date->format('d/m/Y') : 'Không có' }}</p>
@@ -45,15 +59,15 @@
             @endswitch
           </span>
         </p>
-        <a href="{{ route('show.details', ['id' => $maintenance->id]) }}" class="no-underline text-blue-600 hover:underline">
-  Xem chi tiết
-</a>
+      </section>
 
+      <!-- Nhân viên phụ trách -->
+      <section>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4 border-b border-gray-300 pb-2">Nhân viên phụ trách</h3>
+        <p><span class="font-semibold">Tên nhân viên:</span> {{ $maintenance->employee->name ?? 'Chưa được phân công' }}</p>
+        <p><span class="font-semibold">Số điện thoại nhân viên:</span> {{ $maintenance->employee->phone ?? '-' }}</p>
       </section>
     </div>
-  @empty
-    <p class="text-center text-gray-600">Bạn chưa có yêu cầu bảo trì nào.</p>
-  @endforelse
 </main>
   @include('client.component.footer')
 

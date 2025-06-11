@@ -1,12 +1,12 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary py-3 shadow-sm">
-  <div class="container align-items-center">
+  <div class="container d-flex justify-content-between align-items-center">
     <!-- Logo -->
     <a class="navbar-brand d-flex align-items-center" href="{{ route('client.home') }}">
       <img src="{{ asset('images/Logo/Logo.png') }}" alt="Logo" width="45" height="45" class="me-2">
       <span class="fw-bold fs-4 text-white">xedap.com</span>
     </a>
 
-    <!-- Form tìm kiếm -->
+    <!-- Tìm kiếm -->
     <form method="GET" action="{{ route('client.products.index') }}" class="d-flex align-items-center flex-grow-1 mx-4" role="search">
       <select name="category" class="form-select me-2 rounded-3" style="max-width: 220px;">
         <option disabled selected>Danh mục</option>
@@ -21,26 +21,37 @@
       </select>
 
       <div class="input-group search-group" style="max-width: 400px;">
-        <input type="search" name="search" value="{{ request('search') }}" class="form-control rounded-start border-end-0" placeholder="Tìm kiếm sản phẩm..." />
+        <input type="search" name="search" value="{{ request('search') }}" class="form-control rounded-start border-end-0" placeholder="Tìm kiếm sản phẩm...">
         <button class="btn-orange rounded-end px-3" type="submit">
           <i class="fas fa-search me-1"></i> Tìm
         </button>
       </div>
     </form>
 
-    <!-- Nút xóa bộ lọc -->
-    <a href="{{ route('client.home') }}" class="btn btn-light ms-2">Xóa bộ lọc</a>
+    <!-- Xóa lọc -->
+    <a href="{{ route('client.home') }}" class="btn btn-light ms-2">Xóa lọc</a>
 
-    <!-- Icons và logout -->
-    <div class="d-flex align-items-center ms-4 gap-3">
-      <a href="{{ route('cart.index') }}" class="text-white position-relative" title="Giỏ hàng">
+    <!-- Icon & Menu -->
+    <div class="d-flex align-items-center gap-4 ms-4">
+      <!-- Giỏ hàng -->
+      <a href="{{ route('cart.index') }}" class="text-white position-relative me-2" title="Giỏ hàng">
         <i class="bi bi-cart3 fs-5"></i>
+        @if($cartCount > 0)
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger text-white" style="min-width: 20px; height: 20px; font-size: 0.75rem;">
+          {{ $cartCount > 99 ? '99+' : $cartCount }}
+        </span>
+        @endif
       </a>
-    <a href="{{ route('show.progess')}}">
-      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 01-6 0v-1m6 0H9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-    </a>
+
+      <!-- Yêu cầu bảo trì -->
+      <a href="{{ route('show.progess') }}" class="text-white position-relative me-22" title="Yêu cầu bảo trì">
+        <i class="bi bi-tools fs-5"></i>
+        @if($maintenanceCount > 0)
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-success text-white" style="min-width: 20px; height: 20px; font-size: 0.75rem;">
+          {{ $maintenanceCount > 99 ? '99+' : $maintenanceCount }}
+        </span>
+        @endif
+      </a>
     <div class="relative">
       <button id="userMenuButton" class="flex items-center space-x-1 focus:outline-none">
         <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
@@ -80,44 +91,67 @@
 </nav>
 
 <style>
-  .btn-orange {
-    background-color: #ff6600;
-    color: white;
-    border: none;
-  }
+.btn-orange {
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  transition: background-color 0.2s ease;
+}
 
-  .btn-orange:hover {
-    background-color: #e65500;
-    color: white;
-  }
+.btn-orange:hover {
+  background-color: #e65500;
+  color: white;
+}
 
-  .search-group input:focus {
-    box-shadow: none;
-    border-color: #ced4da;
-  }
+.search-group input:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}
 
-  .search-group input {
-    border: 1px solid #ced4da;
-    border-right: none;
-  }
+.search-group input {
+  border: 1px solid #ced4da;
+  border-right: none;
+}
 
-  .search-group button {
-    border: 1px solid #ced4da;
-    border-left: none;
-  }
+.search-group button {
+  border: 1px solid #ced4da;
+  border-left: none;
+}
 
-  .navbar a.text-white:hover {
-    opacity: 0.85;
-  }
+.navbar a.text-white:hover,
+.navbar .btn-light:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
 
-  .navbar-brand img {
-    object-fit: contain;
-  }
+.dropdown-menu a {
+  text-decoration: none;
+  color: #333;
+}
 
-  .form-select {
-    min-width: 180px;
-  }
-  #userMenu a {
-  text-decoration: none; /* Bỏ gạch chân */
+.dropdown-menu a:hover {
+  background-color: #f8f9fa;
+  color: #000;
+}
+
+.show-on-hover {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #fff;
+  min-width: 180px;
+  z-index: 1000;
+}
+
+#userMenuButton:focus + #userMenu,
+#userMenuButton:active + #userMenu {
+  display: block;
+}
+.navbar a.text-white:hover i {
+  transform: scale(1.2);
+  transition: transform 0.2s ease;
+}
+#userMenu a {
+  text-decoration: none; 
 }
 </style>

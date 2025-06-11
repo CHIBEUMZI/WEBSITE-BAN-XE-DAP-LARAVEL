@@ -117,6 +117,7 @@ Route::patch('/purchase-orders/{order}/cancel',[OrderClientController::class, 'c
 Route::get('/maintenance', [MaintenanceClientController::class,'index'])->name('maintenances.index');
 Route::post('/maintenance', [MaintenanceClientController::class,'store'])->name('maintenances.store');
 Route::get('/maintenance/show', [MaintenanceClientController::class,'show'])->name('show.progess');
+Route::get('/maintenance/{id}/details', [MaintenanceClientController::class,'details'])->name('show.details');
 
 // Đăng ký
 Route::view('/register', 'backend.auth.register')->name('register.form');

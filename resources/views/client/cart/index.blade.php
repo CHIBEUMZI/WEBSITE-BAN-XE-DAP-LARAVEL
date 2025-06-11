@@ -56,7 +56,7 @@
                     </td>
                     <td class="p-2">{{ number_format($subtotal, 0, ',', '.') }} VND</td>
                     <td class="p-2">
-                        <a href="{{ route('cart.remove', $item->product->id) }}" class="text-red-600 hover:underline">Xóa</a>
+                        <a href="{{ route('cart.remove', $item->product->id) }}" class="no-underline text-red-600 hover:underline ">Xóa</a>
                     </td>
                 </tr>
             @endforeach
@@ -71,8 +71,8 @@
     </table>
 
     <div class="mt-6">
-        <a href="{{ route('client.home') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Tiếp tục mua sắm</a>
-        <a href="{{ route('cart.buy') }}" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 ml-2">Thanh toán</a>
+        <a href="{{ route('client.home') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 no-underline" >Tiếp tục mua sắm</a>
+        <a href="{{ route('cart.buy') }}" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 ml-2 no-underline">Thanh toán</a>
     </div>
     @else
         <p class="text-gray-600">Giỏ hàng của bạn đang trống.</p>

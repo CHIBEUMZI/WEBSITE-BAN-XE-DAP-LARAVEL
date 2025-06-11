@@ -55,8 +55,8 @@
             Thanh toán khi nhận hàng (COD)
           </label>
           <label class="flex items-center">
-            <input type="radio" name="payment_method" value="Bank Transfer" class="mr-2" required>
-            Chuyển khoản ngân hàng
+            <input type="radio" name="payment_method" value="VNPay" class="mr-2" required>
+            Thanh toán qua VNPay
           </label>
           <label class="flex items-center">
             <input type="radio" name="payment_method" value="Momo" class="mr-2" required>
