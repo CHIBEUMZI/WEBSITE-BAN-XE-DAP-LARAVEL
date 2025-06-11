@@ -124,3 +124,11 @@ Route::view('/register', 'backend.auth.register')->name('register.form');
 Route::post('/register', [UserClientController::class, 'register'])->name('user.register');
 
 
+// Momo callback khi thanh toán xong
+Route::get('/momo/success', [ProductClientController::class, 'momoSuccess'])->name('momo.success');
+// IPN từ MoMo (notify server về trạng thái)
+Route::post('/momo-ipn', [ProductClientController::class, 'momoIpn'])->name('momo.ipn');
+
+// MoMo Của giỏ hàng
+Route::get('/momo/cart-success', [CartClientController::class, 'momoSuccess'])->name('momo.cart.success');
+Route::post('/momo/cart-ipn', [CartClientController::class, 'momoCartIpn'])->name('momo.cart.ipn');

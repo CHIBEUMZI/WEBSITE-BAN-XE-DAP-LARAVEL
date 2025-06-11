@@ -44,6 +44,32 @@
             <label for="customer_address" class="block font-semibold mb-1">Địa chỉ nhận hàng:</label>
             <textarea id="customer_address" name="customer_address" rows="3" required class="w-full border rounded px-3 py-2"></textarea>
         </div>
+        @php
+            $oldPayment = old('payment_method');
+        @endphp
+
+        <div class="mb-3 mt-4">
+            <label class="block mb-1 font-medium">Hình thức thanh toán</label>
+            <div class="space-y-2">
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="payment_method" value="COD" class="mr-2" required {{ $oldPayment == 'COD' ? 'checked' : '' }}>
+                    <span>🛵 Thanh toán khi nhận hàng (COD)</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="payment_method" value="VNPay" class="mr-2" required {{ $oldPayment == 'VNPay' ? 'checked' : '' }}>
+                    <span>🏦 Thanh toán qua VNPay</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="payment_method" value="MoMo" class="mr-2" required {{ $oldPayment == 'MoMo' ? 'checked' : '' }}>
+                    <span>📱 Ví điện tử MoMo</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="payment_method" value="Zalopay" class="mr-2" required {{ $oldPayment == 'Zalopay' ? 'checked' : '' }}>
+                    <span>💰 Ví điện tử ZaloPay</span>
+                </label>
+            </div>
+        </div>
+
         <p class="text-xl font-semibold mb-2">Tổng tiền: <span class="text-red-600" id="totalPrice">{{ number_format($product->price * $quantity, 0, ',', '.') }} VND</span></p>
         <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Xác nhận mua</button>
     </form>

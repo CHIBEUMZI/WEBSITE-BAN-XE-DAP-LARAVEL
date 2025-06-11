@@ -47,27 +47,31 @@
         <label>Địa chỉ giao hàng</label>
         <textarea name="customer_address" class="w-full border p-2" required></textarea>
       </div>
+
+      @php
+        $oldPayment = old('payment_method');
+      @endphp
       <div class="mb-3 mt-4">
-        <label class="block mb-1 font-medium">Hình thức thanh toán</label>
-        <div class="space-y-2">
-          <label class="flex items-center">
-            <input type="radio" name="payment_method" value="COD" class="mr-2" required>
-            Thanh toán khi nhận hàng (COD)
-          </label>
-          <label class="flex items-center">
-            <input type="radio" name="payment_method" value="VNPay" class="mr-2" required>
-            Thanh toán qua VNPay
-          </label>
-          <label class="flex items-center">
-            <input type="radio" name="payment_method" value="Momo" class="mr-2" required>
-            Ví điện tử (Momo)
-          </label>
-          <label class="flex items-center">
-            <input type="radio" name="payment_method" value="Zalopay" class="mr-2" required>
-            Ví điện tử (Zalopay)
-          </label>
+            <label class="block mb-1 font-medium">Hình thức thanh toán</label>
+            <div class="space-y-2">
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="payment_method" value="COD" class="mr-2" required {{ $oldPayment == 'COD' ? 'checked' : '' }}>
+                    <span>🛵 Thanh toán khi nhận hàng (COD)</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="payment_method" value="VNPay" class="mr-2" required {{ $oldPayment == 'VNPay' ? 'checked' : '' }}>
+                    <span>🏦 Thanh toán qua VNPay</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="payment_method" value="MoMo" class="mr-2" required {{ $oldPayment == 'MoMo' ? 'checked' : '' }}>
+                    <span>📱 Ví điện tử MoMo</span>
+                </label>
+                <label class="flex items-center gap-2">
+                    <input type="radio" name="payment_method" value="Zalopay" class="mr-2" required {{ $oldPayment == 'Zalopay' ? 'checked' : '' }}>
+                    <span>💰 Ví điện tử ZaloPay</span>
+                </label>
+            </div>
         </div>
-      </div>
       <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Xác nhận thanh toán</button>
     </form>
   </div>

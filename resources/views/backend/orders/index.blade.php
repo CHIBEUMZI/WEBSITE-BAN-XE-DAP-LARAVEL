@@ -28,6 +28,7 @@
                         <td>{{ number_format($val->total_amount, 0, ',', '.') }} VND</td>
                         <td>{{ $val->status }}</td>
                         <td>{{ $val->shipping_address }}</td>
+                        <td>{{ $val->payment_status }}</td>
                         <td>
                             @if($val->status == 'Đang xử lí')
                                 <form action="{{ route('orders.confirm_cancel', $val->id) }}" method="POST" style="display:inline;">
@@ -60,7 +61,7 @@
     </table>
     <div class="mt-3 d-flex justify-content-center">
         <div class="w-auto">
-            {{ $orders->links() }}
+            {{ $orders->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
         </div>
     </div>
 @endsection

@@ -80,7 +80,7 @@
     </table>
     <div class="mt-3 d-flex justify-content-center">
         <div class="w-auto">
-            {{ $maintenances->links() }}
+            {{ $maintenances->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
         </div>
     </div>
 @endsection
