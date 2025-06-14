@@ -91,7 +91,50 @@ class UserClientController extends Controller
     $user->save();
 
     return redirect()->route('client.home')->with('success', 'Cập nhật thông tin thành công.');
-}
+    }
+
+    public function showForm()
+    {
+        return view('backend.auth.forgot');
+    }
+
+    public function checkInfo(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'phone' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)
+                    ->where('phone', $request->phone)
+                    ->first();
+
+        if ($user) {
+            // chuyển tới form đổi mật khẩu
+            return redirect()->route('password.reset.form', ['user' => $user->id]);
+        } else {
+            return back()->withErrors(['email' => 'Email hoặc số điện thoại không chính xác.']);
+        }
+    }
+
+    public function showResetForm($id)
+    {
+        $user = User::findOrFail($id);
+        return view('backend.auth.reset', compact('user'));
+    }
+
+    public function updatePassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return redirect()->route('login')->with('success', 'Đặt lại mật khẩu thành công!');
+    }
 
 
 }

@@ -124,6 +124,13 @@ Route::view('/register', 'backend.auth.register')->name('register.form');
 Route::post('/register', [UserClientController::class, 'register'])->name('user.register');
 
 
+Route::get('/forgot-password', [UserClientController::class, 'showForm'])->name('password.form');
+Route::post('/forgot-password', [UserClientController::class, 'checkInfo'])->name('password.check');
+Route::get('/reset-password/{user}', [UserClientController::class, 'showResetForm'])->name('password.reset.form');
+Route::post('/reset-password/{user}', [UserClientController::class, 'updatePassword'])->name('password.update.simple');
+
+
+
 // Momo callback khi thanh toán xong
 Route::get('/momo/success', [ProductClientController::class, 'momoSuccess'])->name('momo.success');
 // IPN từ MoMo (notify server về trạng thái)

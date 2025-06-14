@@ -51,7 +51,7 @@ class ProductClientController extends Controller
         }
 
         // Lấy danh sách sản phẩm theo các điều kiện đã chọn
-        $products = $query->paginate(3);
+        $products = $query->paginate(4);
         return view('client.component.search', compact('products'));
         }
 

@@ -77,7 +77,7 @@
                       <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
                     </div>
                     <div class="group">
-                      <a class="small text-muted" href="#!">Forgot password?</a>
+                      <a class="small text-muted" href="{{route('password.form')}}">Forgot password?</a>
                       <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account? <a href="{{route('register.form')}}"
                           style="color: #393f81;">Register here</a></p>
                     </div>
