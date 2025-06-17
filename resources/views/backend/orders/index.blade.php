@@ -15,6 +15,7 @@
                 <th>Total Amount</th>
                 <th>Status</th>
                 <th>Shipping Address</th>
+                <th>Payment Status</th>
                 <th>Comfirm</th>
             </tr>
         </thead>
@@ -30,7 +31,7 @@
                         <td>{{ $val->shipping_address }}</td>
                         <td>{{ $val->payment_status }}</td>
                         <td>
-                            @if($val->status == 'Đang xử lí')
+                            @if($val->status == 'Đang xử lý')
                                 <form action="{{ route('orders.confirm_cancel', $val->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     <input type="hidden" name="action" value="delivered">

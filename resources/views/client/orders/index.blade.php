@@ -12,7 +12,7 @@
 </head>
 <body>
   @include('client.component.header')
-
+ @include('chatbot')
   <div class="max-w-4xl mx-auto px-4 py-8">
     <h2 class="text-3xl font-extrabold text-gray-800 mb-8 font-sans">Đơn hàng của tôi</h2>
 

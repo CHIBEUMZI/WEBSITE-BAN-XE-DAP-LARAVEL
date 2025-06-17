@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 class ProductClientController extends Controller
 {
@@ -94,7 +95,7 @@ class ProductClientController extends Controller
             'total_amount' => $totalAmount,
             'payment_method' => $validated['payment_method'],
             'payment_status' => 'Chưa thanh toán',
-            'status' => 'Đang xử lí',
+            'status' => 'Đang xử lý',
             'shipping_address' => $validated['customer_address'],
             'shipping_fee' => 0,
             'note' => null,
@@ -111,6 +112,9 @@ class ProductClientController extends Controller
         if ($validated['payment_method'] === 'MoMo') {
             return $this->redirectToMomo($order);
         }
+        if ($validated['payment_method'] === 'VNPay') {
+        return redirect()->route('vnpay.payment', ['order_id' => $order->id]);
+        }
 
         // Thanh toán khi nhận
         $product->stock -= $validated['quantity'];
@@ -123,6 +127,52 @@ class ProductClientController extends Controller
 
         return redirect()->route('client.home')->with('success', 'Mua hàng thành công!');
     }
+
+
+public function vnpay_payment(Request $request)
+{
+    $order = Order::findOrFail($request->order_id);
+
+    $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+    $vnp_Returnurl = route('client.home');
+    $vnp_TmnCode = "0TJ8WWM6";
+    $vnp_HashSecret = "OOPXO13LMQNNCRB6SMNBI5N3UZ8UD8XR";
+
+    $vnp_TxnRef = $order->id;
+    $vnp_Amount = $order->total_amount * 100;
+    $vnp_Locale = 'vn';
+    $vnp_IpAddr = $request->ip(); // tốt hơn $_SERVER
+    $now = Carbon::now('Asia/Ho_Chi_Minh');
+
+    $vnp_CreateDate = $now->format('YmdHis');
+    $vnp_ExpireDate = $now->copy()->addMinutes(15)->format('YmdHis');
+
+    $inputData = [
+        "vnp_Version" => "2.1.0",
+        "vnp_TmnCode" => $vnp_TmnCode,
+        "vnp_Amount" => $vnp_Amount,
+        "vnp_Command" => "pay",
+        "vnp_CreateDate" => $vnp_CreateDate,
+        "vnp_CurrCode" => "VND",
+        "vnp_IpAddr" => $vnp_IpAddr,
+        "vnp_Locale" => $vnp_Locale,
+        "vnp_OrderInfo" => "Thanh toán GD: " . $vnp_TxnRef,
+        "vnp_OrderType" => "other",
+        "vnp_ReturnUrl" => $vnp_Returnurl,
+        "vnp_TxnRef" => $vnp_TxnRef,
+        "vnp_ExpireDate" => $vnp_ExpireDate,
+    ];
+
+    ksort($inputData);
+    $hashdata = urldecode(http_build_query($inputData));
+    $query = http_build_query($inputData);
+
+    $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
+    $vnp_Url .= "?" . $query . "&vnp_SecureHash=" . $vnpSecureHash;
+
+    return redirect($vnp_Url);
+}
+
 
     // Chuyển hướng đến MoMo
     private function redirectToMomo($order)
@@ -173,7 +223,7 @@ class ProductClientController extends Controller
 
     // Xử lý sau khi thanh toán MoMo thành công
     public function momoSuccess(Request $request)
-{
+    {
     logger('MoMo success data:', $request->all());
 
     if ($request->input('resultCode') === '0') {
@@ -190,7 +240,7 @@ class ProductClientController extends Controller
         // Cập nhật trạng thái đơn hàng
         $order->update([
             'payment_status' => 'Đã thanh toán',
-            'status' => 'Đang xử lí'
+            'status' => 'Đang xử lý'
         ]);
 
         // Trừ kho sản phẩm
@@ -206,7 +256,7 @@ class ProductClientController extends Controller
     }
 
     return redirect()->route('client.home')->with('error', 'Thanh toán thất bại hoặc bị huỷ.');
-}
+    }
 
     // Gửi POST request đến MoMo
     private function execPostRequest($url, $data)

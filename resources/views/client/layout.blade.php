@@ -20,7 +20,7 @@
     @include('client.component.banner')
   </section>
   </header>
- 
+ @include('chatbot')
 
 
   <!-- Content -->
