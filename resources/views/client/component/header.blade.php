@@ -6,9 +6,11 @@
       <span class="fw-bold fs-4 text-white">xedap.com</span>
     </a>
 
-    <!-- Tìm kiếm -->
-    <form method="GET" action="{{ route('client.products.index') }}" class="d-flex align-items-center flex-grow-1 mx-4" role="search">
-      <select name="category" class="form-select me-2 rounded-3" style="max-width: 220px;">
+  <!-- Form tìm kiếm -->
+  <form method="GET" action="{{ route('client.products.index') }}" class="modern-search-bar flex-grow-1" role="search">
+    <div class="search-box">
+      <!-- Dropdown danh mục -->
+      <select name="category" class="category-select">
         <option disabled selected>Danh mục</option>
         <option value="Xe đạp thể thao đường phố" {{ request('category') === 'Xe đạp thể thao đường phố' ? 'selected' : '' }}>Xe đạp thể thao đường phố</option>
         <option value="Xe đạp địa hình" {{ request('category') === 'Xe đạp địa hình' ? 'selected' : '' }}>Xe đạp địa hình</option>
@@ -20,17 +22,15 @@
         <option value="Xe đạp fixed gear" {{ request('category') === 'Xe đạp fixed gear' ? 'selected' : '' }}>Xe đạp fixed gear</option>
       </select>
 
-      <div class="input-group search-group" style="max-width: 400px;">
-        <input type="search" name="search" value="{{ request('search') }}" class="form-control rounded-start border-end-0" placeholder="Tìm kiếm sản phẩm...">
-        <button class="btn-orange rounded-end px-3" type="submit">
-          <i class="fas fa-search me-1"></i> Tìm
-        </button>
-      </div>
-    </form>
+      <!-- Input tìm kiếm -->
+      <input type="search" name="search" value="{{ request('search') }}" class="search-input" placeholder="Tìm kiếm sản phẩm...">
 
-    <!-- Xóa lọc -->
-    <a href="{{ route('client.home') }}" class="btn btn-light ms-2">Xóa lọc</a>
-
+      <!-- Nút tìm kiếm -->
+      <button type="submit" class="search-button">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </form>
     <!-- Icon & Menu -->
     <div class="d-flex align-items-center gap-4 ms-4">
       <!-- Giỏ hàng -->
@@ -53,16 +53,22 @@
         @endif
       </a>
     <div class="relative">
-      <button id="userMenuButton" class="flex items-center space-x-1 focus:outline-none">
-        <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-        <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+    <button id="userMenuButton" class="flex items-center gap-2 px-3 py-2 rounded-md focus:outline-none">
+        <!-- Avatar -->
+        <img src="{{ Auth::user()->image ? asset('storage/' . Auth::user()->image) : asset('images/default-avatar.png') }}"
+            alt="Avatar"
+            class="w-8 h-8 rounded-full object-cover border border-gray-300">
+
+        <!-- Tên người dùng -->
+        {{-- <span class="text-sm font-medium text-white">
+            {{ Auth::user()->name }}
+        </span> --}}
+
+        <!-- Mũi tên dropdown -->
+        <svg class="w-4 h-4 text-white-500" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" />
         </svg>
-      </div>
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" />
-        </svg>
-      </button>
+    </button>
       <!-- Dropdown Menu -->
       <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 text-black">
         <a href="{{ route('profile.show') }}" class="block px-4 py-2 hover:bg-gray-100">Thông tin của tôi</a>
@@ -91,7 +97,7 @@
 </nav>
 
 <style>
-.btn-orange {
+/* .btn-orange {
   background-color: #ff6600;
   color: white;
   border: none;
@@ -153,5 +159,79 @@
 }
 #userMenu a {
   text-decoration: none; 
+} */
+/* Thanh tìm kiếm hiện đại */
+.modern-search-bar {
+  background-color: #0d6efd; /* Nền xanh */
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 600px;
+  margin: 0 auto;
 }
+.search-box {
+  display: flex;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  align-items: center;
+}
+a{
+  text-decoration: none !important;
+}
+/* Dropdown danh mục gọn gàng */
+.category-select {
+  border: none;
+  padding: 10px 15px;
+  background-color: transparent;
+  font-weight: bold;
+  font-size: 14px;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Giao diện ô tìm kiếm */
+.search-input {
+  flex: 1;
+  border: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  outline: none;
+  color: #333;
+}
+
+/* Icon tìm kiếm */
+.search-button {
+  background: transparent;
+  border: none;
+  padding: 0 15px;
+  color: #999;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .modern-search-bar {
+    padding: 6px;
+  }
+
+  .search-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .category-select,
+  .search-input,
+  .search-button {
+    width: 100%;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .search-button {
+    border-bottom: none;
+    text-align: right;
+  }
+}
+
 </style>

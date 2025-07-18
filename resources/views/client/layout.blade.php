@@ -20,9 +20,7 @@
     @include('client.component.banner')
   </section>
   </header>
- @include('chatbot')
-
-
+ @include('client.component.chatbot')
   <!-- Content -->
   @yield('content')
 

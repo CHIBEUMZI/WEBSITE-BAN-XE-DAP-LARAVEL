@@ -15,6 +15,8 @@ use App\Http\Controllers\Client\OrderClientController;
 use App\Http\Controllers\Client\MaintenanceClientController;
 use App\Http\Controllers\Client\ChatbotController;
 use App\Http\Controllers\Client\PaymentController;
+use Illuminate\Support\Facades\Http;
+
 
 
 use App\Models\Product;
@@ -142,11 +144,17 @@ Route::post('/momo-ipn', [ProductClientController::class, 'momoIpn'])->name('mom
 Route::get('/momo/cart-success', [CartClientController::class, 'momoSuccess'])->name('momo.cart.success');
 Route::post('/momo/cart-ipn', [CartClientController::class, 'momoCartIpn'])->name('momo.cart.ipn');
 
-Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
-Route::get('/chatbot', function () {
-    return view('chatbot');
-});
+// Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage'])->name('chatbot.send');
+// Route::get('/chatbot', function () {
+//     return view('chatbot');
+// });
+Route::post('/chatbot/send', [ChatbotController::class, 'sendMessage']);
+Route::post('/chat-gemini/send', [App\Http\Controllers\Client\GeminiController::class, 'sendMessage']);
+
 
 Route::get('/vnpay/payment', [ProductClientController::class, 'vnpay_payment'])->name('vnpay.payment');
+
+
+
 
 

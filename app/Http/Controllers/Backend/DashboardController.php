@@ -19,9 +19,9 @@ class DashboardController extends Controller
 
     // Doanh thu theo tháng trong năm
     $monthlyRevenue = DB::table('orders')
-        ->selectRaw('MONTH(created_at) as month, SUM(total_amount) as total')
-        ->whereYear('created_at', $year)
-        ->groupByRaw('MONTH(created_at)')
+        ->selectRaw('MONTH(order_date) as month, SUM(total_amount) as total')
+        ->whereYear('order_date', $year)
+        ->groupByRaw('MONTH(order_date)')
         ->pluck('total', 'month')
         ->toArray();
 
@@ -32,9 +32,9 @@ class DashboardController extends Controller
         $end = Carbon::parse($to)->endOfDay();       
 
         $dailyRevenue = DB::table('orders')
-            ->selectRaw('DATE(created_at) as day, SUM(total_amount) as total')
-            ->whereBetween('created_at', [$start, $end])
-            ->groupByRaw('DATE(created_at)')
+            ->selectRaw('DATE(order_date) as day, SUM(total_amount) as total')
+            ->whereBetween('order_date', [$start, $end])
+            ->groupByRaw('DATE(order_date)')
             ->pluck('total', 'day')
             ->toArray();
     }
@@ -52,7 +52,7 @@ class DashboardController extends Controller
         ->toArray();
 
     $todayRevenue = DB::table('orders')
-        ->whereDate('created_at', now()->toDateString())
+        ->whereDate('order_date', now()->toDateString())
         ->sum('total_amount');
 
     $todayProduct = DB::table('order_items')

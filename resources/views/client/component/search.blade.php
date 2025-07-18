@@ -7,13 +7,18 @@
     @else
         <section class="py-12 bg-gray-100">
             <div class="max-w-7xl mx-auto px-4">
-                <h2 class="text-3xl font-bold mb-8 text-blue-700">
+                <div class="flex items-center justify-between flex-wrap gap-2 mb-6 px-2">
+                <h2 class="text-2xl sm:text-3xl font-semibold text-blue-700">
                     Kết quả tìm kiếm cho: 
                     <span class="italic text-gray-700">
-                        {{ request('search') ? '"' . request('search') . '"' : 'Tất cả sản phẩm' }}
+                    {{ request('search') ? '"' . request('search') . '"' : 'Tất cả sản phẩm' }}
                     </span>
                 </h2>
-
+                <!-- Nút xóa lọc -->
+                <a href="{{ route('client.home') }}" class="btn btn-primary btn-sm d-flex align-items-center gap-1 px-3 py-1 shadow-sm" style="background-color: #007AFF; border-color: #007AFF;">
+                    <i class="fas fa-times"></i> Xóa lọc
+                </a>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                     @foreach ($products as $product)
                         <div class="relative bg-white p-4 rounded-lg shadow-md hover:shadow-xl hover:scale-105 transform transition duration-300 text-center cursor-pointer flex flex-col justify-between h-full">

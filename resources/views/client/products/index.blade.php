@@ -12,7 +12,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
   @include('client.component.header')
- @include('chatbot')
+ @include('client.component.chatbot')
   <div class="max-w-7xl mx-auto py-10 px-4 grid grid-cols-1 md:grid-cols-2 gap-10">
     <!-- Hình ảnh sản phẩm -->
     <div>
