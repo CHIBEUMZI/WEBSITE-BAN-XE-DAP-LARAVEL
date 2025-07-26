@@ -1,13 +1,11 @@
-<!-- Bootstrap + jQuery -->
+<!-- Bootstrap + jQuery + Socket.IO -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.6.1/dist/socket.io.min.js"></script>
 
 <style>
-body.modal-open {
-    overflow: auto !important;
-}
+body.modal-open { overflow: auto !important; }
 
 #chat-toggle-btn {
     position: fixed;
@@ -76,13 +74,8 @@ body.modal-open {
     margin: 5px 0;
 }
 
-.chat-msg.user {
-    justify-content: flex-end;
-}
-
-.chat-msg.bot {
-    justify-content: flex-start;
-}
+.chat-msg.user { justify-content: flex-end; }
+.chat-msg.bot { justify-content: flex-start; }
 
 .chat-msg .avatar {
     width: 32px;
@@ -117,13 +110,13 @@ body.modal-open {
 }
 </style>
 
-<!-- Nút mở chat -->
+<!-- Toggle Chat Button -->
 <div id="chat-toggle-btn" onclick="toggleChat()">
     <img src="{{ asset('images/Chatbot/chatbot.jpg') }}" alt="Bot Icon">
     Trợ lý ảo
 </div>
 
-<!-- Khung Chat -->
+<!-- Chat Modal -->
 <div class="modal" id="chatModal" tabindex="-1" data-bs-backdrop="false" data-bs-scroll="true">
     <div class="modal-dialog m-0 position-fixed" style="right: 20px; bottom: 100px; width: 500px; max-width: none;">
         <div class="modal-content chat-box">
@@ -158,7 +151,6 @@ body.modal-open {
 const chatModalEl = document.getElementById('chatModal');
 const chatModal = new bootstrap.Modal(chatModalEl);
 
-<<<<<<< HEAD
 function toggleChat() {
     if (chatModalEl.classList.contains('show')) {
         chatModal.hide();
@@ -179,16 +171,13 @@ function appendMessage(content, sender) {
     div.className = `chat-msg ${sender}`;
 
     const avatarSrc = sender === 'user'
-        ? '{{ Auth::user()->image ? asset('storage/' . Auth::user()->image) : asset("images/Chatbot/default-user.jpg") }}'
+        ? '{{ optional(Auth::user())->image ? asset("storage/" . Auth::user()->image) : asset("images/Chatbot/default-user.jpg") }}'
         : '{{ asset("images/Chatbot/chatbot.jpg") }}';
 
     const bubble = `<div class="bubble">${content}</div>`;
     const avatar = `<img src="${avatarSrc}" class="avatar">`;
 
-    // user: bubble trước, avatar sau (phải)
-    // bot: avatar trước, bubble sau (trái)
     div.innerHTML = sender === 'user' ? `${bubble}${avatar}` : `${avatar}${bubble}`;
-
     document.getElementById('chatbox').appendChild(div);
     scrollToBottom();
 }
@@ -210,6 +199,29 @@ function removeTyping() {
     if (typing) typing.remove();
 }
 
+// Rasa socket setup
+const socket = io("http://localhost:5005", {
+    transports: ["websocket"]
+});
+const sessionId = "user_" + Math.floor(Math.random() * 1000000);
+
+socket.on("connect", () => {
+    console.log("Connected to Rasa");
+    socket.emit("session_request", { session_id: sessionId });
+});
+
+socket.on("session_confirm", (session) => {
+    console.log("Session started:", session.session_id);
+});
+
+socket.on("bot_uttered", (msg) => {
+    removeTyping();
+    if (msg.text) {
+        const reply = msg.text.replace(/\n/g, '<br>');
+        appendMessage(reply, 'bot');
+    }
+});
+
 function sendMessage() {
     const input = document.getElementById('message');
     const message = input.value.trim();
@@ -219,119 +231,28 @@ function sendMessage() {
     input.value = '';
     showTyping();
 
-    $.ajax({
-        url: '{{ url("/chat-gemini/send") }}',
-        method: 'POST',
-        data: {
-            message: message,
-            _token: '{{ csrf_token() }}'
-        },
-        success: function (data) {
-            removeTyping();
-            const reply = data.reply.replace(/\n/g, '<br>');
-            appendMessage(reply, 'bot');
-        },
-        error: function () {
-            removeTyping();
-            appendMessage('Xin lỗi, hiện không thể phản hồi.', 'bot');
-        }
+    socket.emit("user_uttered", {
+        message: message,
+        session_id: sessionId
     });
 }
-    function toggleChat() {
-        if (chatModalEl.classList.contains('show')) {
-            chatModal.hide();
-        } else {
-            chatModal.show();
-            document.body.style.overflow = 'auto';
-            scrollToBottom();
-        }
+
+document.getElementById('message').addEventListener('keypress', function (e) {
+    if (e.key === 'Enter') sendMessage();
+});
+
+// Hide chatbot if clicking outside
+document.addEventListener('click', function (event) {
+    const modal = document.getElementById('chatModal');
+    const toggleBtn = document.getElementById('chat-toggle-btn');
+    const dialog = modal.querySelector('.modal-dialog');
+
+    const clickedInsideModal = dialog.contains(event.target);
+    const clickedToggleButton = toggleBtn.contains(event.target);
+    const isVisible = modal.classList.contains('show');
+
+    if (isVisible && !clickedInsideModal && !clickedToggleButton) {
+        chatModal.hide();
     }
-
-    function scrollToBottom() {
-        const chatbox = document.getElementById('chatbox');
-        chatbox.scrollTop = chatbox.scrollHeight;
-    }
-
-    function appendMessage(content, sender) {
-        const div = document.createElement('div');
-        div.className = `chat-msg ${sender}`;
-        div.innerHTML = content;
-        document.getElementById('chatbox').appendChild(div);
-        scrollToBottom();
-    }
-
-    function showTyping() {
-        const typingDiv = document.createElement('div');
-        typingDiv.id = 'typing';
-        typingDiv.className = 'chat-msg bot';
-        typingDiv.innerHTML = `<i>Đang nhập...</i>`;
-        document.getElementById('chatbox').appendChild(typingDiv);
-        scrollToBottom();
-    }
-
-    function removeTyping() {
-        const typing = document.getElementById('typing');
-        if (typing) typing.remove();
-    }
-
-    // Socket.IO setup for Rasa
-    const socket = io("http://localhost:5005", {
-        transports: ["websocket"]
-    });
-
-    const sessionId = "user_" + Math.floor(Math.random() * 1000000);
-
-    socket.on("connect", () => {
-        console.log("Connected to Rasa");
-        socket.emit("session_request", { session_id: sessionId });
-    });
-
-    socket.on("session_confirm", (session) => {
-        console.log("Session started:", session.session_id);
-    });
-
-    socket.on("bot_uttered", (msg) => {
-        removeTyping();
-        if (msg.text) {
-            const reply = msg.text.replace(/\n/g, '<br>');
-            appendMessage(reply, 'bot');
-        }
-    });
-
-    function sendMessage() {
-        const input = document.getElementById('message');
-        const message = input.value.trim();
-        if (message === '') return;
-
-        appendMessage(message, 'user');
-        input.value = '';
-        showTyping();
-
-        socket.emit("user_uttered", {
-            message: message,
-            session_id: sessionId
-        });
-    }
-
-    document.getElementById('message').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-
-    document.addEventListener('click', function (event) {
-        const modal = document.getElementById('chatModal');
-        const toggleBtn = document.getElementById('chat-toggle-btn');
-        const dialog = modal.querySelector('.modal-dialog');
-
-        const clickedInsideModal = dialog.contains(event.target);
-        const clickedToggleButton = toggleBtn.contains(event.target);
-
-        const isVisible = modal.classList.contains('show');
-
-        if (isVisible && !clickedInsideModal && !clickedToggleButton) {
-            chatModal.hide();
-        }
-    });
-
+});
 </script>
