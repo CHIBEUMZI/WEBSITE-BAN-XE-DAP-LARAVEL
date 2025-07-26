@@ -1,15 +1,13 @@
-<!-- Bootstrap CSS + JS -->
+<!-- Bootstrap + jQuery -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <style>
-/* Cho phép cuộn khi modal mở */
 body.modal-open {
     overflow: auto !important;
 }
 
-/* Nút mở chat */
 #chat-toggle-btn {
     position: fixed;
     bottom: 20px;
@@ -36,6 +34,7 @@ body.modal-open {
     height: 25px;
     margin-bottom: 4px;
 }
+
 .chat-box {
     width: 450px;
     height: 500px;
@@ -70,23 +69,44 @@ body.modal-open {
 }
 
 .chat-msg {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 5px 0;
+}
+
+.chat-msg.user {
+    justify-content: flex-end;
+}
+
+.chat-msg.bot {
+    justify-content: flex-start;
+}
+
+.chat-msg .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-msg .bubble {
     max-width: 80%;
     word-wrap: break-word;
     padding: 10px 15px;
     border-radius: 20px;
-    margin: 5px 0;
     font-size: 14px;
 }
 
-.chat-msg.user {
+.chat-msg.user .bubble {
     background-color: #DCF8C6;
-    align-self: flex-end;
+    border-top-right-radius: 0;
 }
 
-.chat-msg.bot {
+.chat-msg.bot .bubble {
     background-color: #ffffff;
     border: 1px solid #ccc;
-    align-self: flex-start;
+    border-top-left-radius: 0;
 }
 
 .chat-footer {
@@ -104,92 +124,115 @@ body.modal-open {
 
 <!-- Khung Chat -->
 <div class="modal" id="chatModal" tabindex="-1" data-bs-backdrop="false" data-bs-scroll="true">
-  <div class="modal-dialog m-0 position-fixed" style="right: 20px; bottom: 100px; width: 500px; max-width: none;">
-    <div class="modal-content chat-box">
-      <div class="chat-header">
-        <div class="d-flex align-items-center">
-          <img src="{{ asset('images/Logo/Logo.png') }}" alt="logo">
-          <span>Xedap.com</span>
+    <div class="modal-dialog m-0 position-fixed" style="right: 20px; bottom: 100px; width: 500px; max-width: none;">
+        <div class="modal-content chat-box">
+            <div class="chat-header">
+                <div class="d-flex align-items-center">
+                    <img src="{{ asset('images/Logo/Logo.png') }}" alt="logo">
+                    <span>Xedap.com</span>
+                </div>
+                <button class="btn btn-sm btn-light" onclick="toggleChat()">−</button>
+            </div>
+            <div id="chatbox" class="d-flex flex-column">
+                <div class="chat-msg bot">
+                    <img src="{{ asset('images/Chatbot/chatbot.jpg') }}" class="avatar" />
+                    <div class="bubble">Xin chào Anh/Chị! Em là trợ lý ảo.</div>
+                </div>
+                <div class="chat-msg bot">
+                    <img src="{{ asset('images/Chatbot/chatbot.jpg') }}" class="avatar" />
+                    <div class="bubble">Em rất sẵn lòng hỗ trợ Anh/Chị 😊</div>
+                </div>
+            </div>
+            <div class="chat-footer">
+                <div class="input-group">
+                    <input type="text" id="message" class="form-control" placeholder="Nhập tin nhắn...">
+                    <button class="btn btn-primary" onclick="sendMessage()">Gửi</button>
+                </div>
+            </div>
         </div>
-        <button class="btn btn-sm btn-light" onclick="toggleChat()">−</button>
-      </div>
-      <div id="chatbox" class="d-flex flex-column">
-        <div class="chat-msg bot">Xin chào Anh/Chị! Em là trợ lý ảo.</div>
-        <div class="chat-msg bot">Em rất sẵn lòng hỗ trợ Anh/Chị 😊</div>
-      </div>
-      <div class="chat-footer">
-        <div class="input-group">
-          <input type="text" id="message" class="form-control" placeholder="Nhập tin nhắn...">
-          <button class="btn btn-primary" onclick="sendMessage()">Gửi</button>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 
-<!-- JavaScript -->
 <script>
-    const chatModalEl = document.getElementById('chatModal');
-    const chatModal = new bootstrap.Modal(chatModalEl);
+const chatModalEl = document.getElementById('chatModal');
+const chatModal = new bootstrap.Modal(chatModalEl);
 
-    function toggleChat() {
-        if (chatModalEl.classList.contains('show')) {
-            chatModal.hide();
-        } else {
-            chatModal.show();
-            document.body.style.overflow = 'auto'; // Cho phép scroll khi mở chat
-            scrollToBottom();
+function toggleChat() {
+    if (chatModalEl.classList.contains('show')) {
+        chatModal.hide();
+    } else {
+        chatModal.show();
+        document.body.style.overflow = 'auto';
+        scrollToBottom();
+    }
+}
+
+function scrollToBottom() {
+    const chatbox = document.getElementById('chatbox');
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+function appendMessage(content, sender) {
+    const div = document.createElement('div');
+    div.className = `chat-msg ${sender}`;
+
+    const avatarSrc = sender === 'user'
+        ? '{{ Auth::user()->image ? asset('storage/' . Auth::user()->image) : asset("images/Chatbot/default-user.jpg") }}'
+        : '{{ asset("images/Chatbot/chatbot.jpg") }}';
+
+    const bubble = `<div class="bubble">${content}</div>`;
+    const avatar = `<img src="${avatarSrc}" class="avatar">`;
+
+    // user: bubble trước, avatar sau (phải)
+    // bot: avatar trước, bubble sau (trái)
+    div.innerHTML = sender === 'user' ? `${bubble}${avatar}` : `${avatar}${bubble}`;
+
+    document.getElementById('chatbox').appendChild(div);
+    scrollToBottom();
+}
+
+function showTyping() {
+    const typingDiv = document.createElement('div');
+    typingDiv.id = 'typing';
+    typingDiv.className = 'chat-msg bot';
+    typingDiv.innerHTML = `
+        <img src="{{ asset('images/Chatbot/chatbot.jpg') }}" class="avatar" />
+        <div class="bubble"><i>Đang nhập...</i></div>
+    `;
+    document.getElementById('chatbox').appendChild(typingDiv);
+    scrollToBottom();
+}
+
+function removeTyping() {
+    const typing = document.getElementById('typing');
+    if (typing) typing.remove();
+}
+
+function sendMessage() {
+    const input = document.getElementById('message');
+    const message = input.value.trim();
+    if (message === '') return;
+
+    appendMessage(message, 'user');
+    input.value = '';
+    showTyping();
+
+    $.ajax({
+        url: '{{ url("/chat-gemini/send") }}',
+        method: 'POST',
+        data: {
+            message: message,
+            _token: '{{ csrf_token() }}'
+        },
+        success: function (data) {
+            removeTyping();
+            const reply = data.reply.replace(/\n/g, '<br>');
+            appendMessage(reply, 'bot');
+        },
+        error: function () {
+            removeTyping();
+            appendMessage('Xin lỗi, hiện không thể phản hồi.', 'bot');
         }
-    }
-
-    function scrollToBottom() {
-        const chatbox = document.getElementById('chatbox');
-        chatbox.scrollTop = chatbox.scrollHeight;
-    }
-
-    function appendMessage(content, sender) {
-        const div = document.createElement('div');
-        div.className = `chat-msg ${sender}`;
-        div.innerHTML = content;
-        document.getElementById('chatbox').appendChild(div);
-        scrollToBottom();
-    }
-    function showTyping() {
-        const typingDiv = document.createElement('div');
-        typingDiv.id = 'typing';
-        typingDiv.className = 'chat-msg bot';
-        typingDiv.innerHTML = `<img src="{{ asset('images/Chatbot/chatbot.jpg') }}" class="avatar" /><div><i>Đang nhập...</i></div>`;
-        document.getElementById('chatbox').appendChild(typingDiv);
-        scrollToBottom();
-    }
-    function removeTyping() {
-        const typing = document.getElementById('typing');
-        if (typing) typing.remove();
-    }
-    function sendMessage() {
-        const input = document.getElementById('message');
-        const message = input.value.trim();
-        if (message === '') return;
-
-        appendMessage(message, 'user');
-        input.value = '';
-        showTyping();
-        $.ajax({
-            url: '{{ url("/chat-gemini/send") }}',
-            method: 'POST',
-            data: {
-                message: message,
-                _token: '{{ csrf_token() }}'
-            },
-            success: function (data) {
-                const reply = data.reply.replace(/\n/g, '<br>');
-                appendMessage(reply, 'bot');
-                removeTyping();
-            },
-            error: function () {
-                removeTyping();
-                appendMessage('Xin lỗi, hiện không thể phản hồi.', 'bot');
-            }
-        });
-    }
+    });
+}
 </script>

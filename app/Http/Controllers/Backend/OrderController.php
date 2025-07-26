@@ -29,7 +29,7 @@ class OrderController extends Controller
     {
         $order = Order::findOrFail($id);
 
-        if ($request->action === 'delivered' && $order->status === 'Đang xử lí') {
+        if ($request->action === 'delivered' && $order->status === 'Đang xử lý') {
             $order->status = 'Giao hàng';
         } elseif ($request->action === 'cancel' && $order->status === 'Chờ xác nhận hủy') {
             $order->status = 'Đã hủy';

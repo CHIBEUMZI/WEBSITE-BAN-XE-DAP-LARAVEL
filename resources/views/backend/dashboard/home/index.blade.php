@@ -1,75 +1,86 @@
 @extends('backend.dashboard.layout')
 @section('content')
 
-<form method="GET" action="{{ route('dashboard.index') }}" class="mb-4">
-    <div class="row">
-        <div class="col-md-3">
-            <label>Từ ngày:</label>
-            <input type="date" name="from" class="form-control" value="{{ request('from') }}">
+<!-- Bộ lọc -->
+<form method="GET" action="{{ route('dashboard.index') }}" class="mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            <label class="block text-gray-700 font-semibold mb-1">Từ ngày:</label>
+            <input type="date" name="from" value="{{ request('from') }}"
+                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
-        <div class="col-md-3">
-            <label>Đến ngày:</label>
-            <input type="date" name="to" class="form-control" value="{{ request('to') }}">
+        <div>
+            <label class="block text-gray-700 font-semibold mb-1">Đến ngày:</label>
+            <input type="date" name="to" value="{{ request('to') }}"
+                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
-        <div class="col-md-3">
-            <label>Năm:</label>
-            <input type="number" name="year" class="form-control" value="{{ request('year') }}" placeholder="VD: 2025">
+        <div>
+            <label class="block text-gray-700 font-semibold mb-1">Năm:</label>
+            <input type="number" name="year" value="{{ request('year') }}" placeholder="VD: 2025"
+                class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
-        <div class="col-md-3 d-flex align-items-end">
-            <button type="submit" class="btn btn-success w-100">Lọc</button>
+        <div class="flex items-end">
+            <button type="submit"
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                Lọc
+            </button>
         </div>
     </div>
 </form>
 
-<div class="row mb-4">
-    <div class="col-md-6 col-lg-4">
-        <div class="card p-4 text-white" style="background: linear-gradient(135deg, #198754, #28a745); border-radius: 16px;">
-            <div>
-                <h6>💵 Doanh thu hôm nay</h6>
-                <h3>{{ number_format($todayRevenue ?? 0, 0, ',', '.') }} VNĐ</h3>
-            </div>
-        </div>
+<!-- Thống kê nhanh -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <div class="bg-gradient-to-r from-green-600 to-green-400 text-white p-6 rounded-2xl shadow-md">
+        <h6 class="text-sm">💵 Doanh thu hôm nay</h6>
+        <h3 class="text-2xl font-bold mt-2">{{ number_format($todayRevenue ?? 0, 0, ',', '.') }} VNĐ</h3>
     </div>
 
-    <div class="col-md-5 col-lg-3">
-        <div class="card p-4 text-white" style="background: linear-gradient(135deg, #0d6efd, #0dcaf0); border-radius: 16px;">
-            <div>
-                <h6>💵 Số lượng xe đã bán hôm nay</h6>
-                <h3 style="text-align: center">{{ $todayProduct ?? 'Đang cập nhật' }}</h3>
-            </div>
-        </div>
+    <div class="bg-gradient-to-r from-blue-600 to-blue-300 text-white p-6 rounded-2xl shadow-md">
+        <h6 class="text-sm">🚴‍♂️ Số lượng xe đã bán hôm nay</h6>
+        <h3 class="text-2xl font-bold text-center mt-2">{{ $todayProduct ?? 'Đang cập nhật' }}</h3>
     </div>
 </div>
 
-<h3 class="mb-4">📊 Thống kê</h3>
-<h5 class="mt-5 mb-4">💰 Doanh thu theo ngày ({{ $from }} - {{ $to }})</h5>
+<!-- Biểu đồ -->
+<h3 class="text-xl font-bold text-gray-800 mb-6">📊 Thống kê</h3>
+
+<h5 class="text-lg font-semibold text-gray-700 mt-8 mb-3">💰 Doanh thu theo ngày ({{ $from }} - {{ $to }})</h5>
 @if (!empty($dailyRevenue))
-    <canvas id="dailyChart" height="100"></canvas>
+    <div class="bg-white p-4 rounded-xl shadow-md">
+        <canvas id="dailyChart" height="100"></canvas>
+    </div>
 @else
-    <p>Không có dữ liệu doanh thu theo ngày.</p>
+    <p class="text-gray-500 italic">Không có dữ liệu doanh thu theo ngày.</p>
 @endif
 
-<h5 class="mt-5 mb-4">📅 Doanh thu theo tháng theo từng năm({{ $year }})</h5>
+<h5 class="text-lg font-semibold text-gray-700 mt-8 mb-3">📅 Doanh thu theo tháng theo từng năm ({{ $year }})</h5>
 @if (!empty($monthlyRevenue))
-    <canvas id="revenueChart" height="100"></canvas>
+    <div class="bg-white p-4 rounded-xl shadow-md">
+        <canvas id="revenueChart" height="100"></canvas>
+    </div>
 @else
-    <p>Không có dữ liệu doanh thu theo tháng.</p>
+    <p class="text-gray-500 italic">Không có dữ liệu doanh thu theo tháng.</p>
 @endif
-<h5 class="mt-5 mb-4">📦 Biểu đồ tồn kho sản phẩm</h5>
+
+<h5 class="text-lg font-semibold text-gray-700 mt-8 mb-3">📦 Biểu đồ tồn kho sản phẩm</h5>
 @if (!empty($inventory))
-    <canvas id="inventoryChart" height="100"></canvas>
+    <div class="bg-white p-4 rounded-xl shadow-md">
+        <canvas id="inventoryChart" height="100"></canvas>
+    </div>
 @else
-    <p>Không có dữ liệu tồn kho.</p>
+    <p class="text-gray-500 italic">Không có dữ liệu tồn kho.</p>
 @endif
 
-<h5 class="mt-5">🗂️ Phân loại sản phẩm</h5>
+<h5 class="text-lg font-semibold text-gray-700 mt-8 mb-3">🗂️ Phân loại sản phẩm</h5>
 @if (!empty($categoryDistribution))
-    <canvas id="categoryChart" class="mt-2"></canvas>
+    <div class="bg-white p-4 rounded-xl shadow-md max-w-xl mx-auto">
+        <canvas id="categoryChart" height="400"></canvas>
+    </div>
 @else
-    <p>Không có dữ liệu phân loại.</p>
+    <p class="text-gray-500 italic">Không có dữ liệu phân loại.</p>
 @endif
 
-
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const inventoryLabels = @json(array_keys($inventory ?? []));
@@ -142,33 +153,4 @@
         });
     }
 </script>
-<style>
-    .card {
-      border: none;
-      border-radius: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    canvas {
-      background-color: #fff;
-      border-radius: 16px;
-      padding: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    #categoryChart {
-      max-width: 500px;
-      height: 500px !important;
-      margin: 0 auto;
-    }
-    .search-bar {
-      margin-bottom: 30px;
-    }
-    .search-input {
-      width: 100%;
-      max-width: 400px;
-      padding: 8px 16px;
-      border: 1px solid #ced4da;
-      border-radius: 30px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-</style>
 @endsection

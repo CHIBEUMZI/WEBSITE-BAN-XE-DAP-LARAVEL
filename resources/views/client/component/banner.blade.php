@@ -1,65 +1,43 @@
-<style>
-  /* Header swiper chiếm toàn bộ chiều cao màn hình */
-  .swiper-banner {
-    height: 70vh;
-  }
-
-  /* .swiper-banner .swiper-wrapper,
-  .swiper-banner .swiper-slide {
-    height: 100%;
-  } */
-
-.swiper-banner .swiper-slide {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* background-color: #000; hoặc màu khác để ảnh nổi bật hơn */
-}
-
-.swiper-banner .swiper-slide img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-
-</style>
-
-<div class="relative w-full swiper-banner">
-  <div class="max-w-7xl mx-auto h-full">
-    <div class="swiper h-full">
-      <div class="swiper-wrapper">
-        @for ($i = 1; $i <= 5; $i++)
-          <div class="swiper-slide">
-            <img src="{{ asset('images/Banner/Banner' . $i . '.jpg') }}" alt="Banner xe đạp {{ $i }}">
-          </div>
-        @endfor
-      </div>
-
-      <!-- Nút điều hướng -->
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
+<div class="w-full bg-blue-100 py-12">
+<div class="w-full">
+  <div class="swiper swiper-banner w-full h-[600px] relative rounded-none overflow-hidden">
+    <div class="swiper-wrapper">
+      @for ($i = 1; $i <= 8; $i++)
+        <div class="swiper-slide">
+          <img src="{{ asset('images/Banner/Banner' . $i . '.jpg') }}" alt="Banner {{ $i }}"
+            class="w-full h-full object-cover" />
+        </div>
+      @endfor
     </div>
+
+    <!-- Navigation + pagination -->
+    <div class="swiper-button-next text-white"></div>
+    <div class="swiper-button-prev text-white"></div>
+    <div class="swiper-pagination"></div>
   </div>
 </div>
 
-<!-- Swiper JS -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+  </div>
+
 <script>
-  const swiper = new Swiper('.swiper', {
+  const swiper = new Swiper('.swiper-banner', {
     slidesPerView: 1,
+    loop: true,
     spaceBetween: 30,
+    effect: 'fade',
+    fadeEffect: { crossFade: true },
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false,
+    },
+    speed: 800,
+    pagination: {
+      el: '.swiper-pagination',
+      clickable: true,
+    },
     navigation: {
       nextEl: '.swiper-button-next',
       prevEl: '.swiper-button-prev',
     },
-    loop: true,
-    autoplay: {
-      delay: 1000,
-      disableOnInteraction: false, // tiếp tục autoplay sau khi người dùng tương tác
-    },
-    speed: 800,
-    effect: 'fade',
-    fadeEffect: { crossFade: true },
   });
 </script>

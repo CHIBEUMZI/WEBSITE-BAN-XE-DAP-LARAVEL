@@ -70,63 +70,73 @@ class ProductClientController extends Controller
         }
 
 
-    public function processBuy(Request $request, $id)
-    {
-        $product = Product::findOrFail($id);
+public function processBuy(Request $request, $id)
+{
+    $product = Product::findOrFail($id);
 
-        $validated = $request->validate([
-            'quantity' => 'required|integer|min:1',
-            'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:20',
-            'customer_address' => 'required|string|max:500',
-            'payment_method' => 'required|string|max:50',
-        ]);
+    $validated = $request->validate([
+        'quantity' => 'required|integer|min:1',
+        'customer_name' => 'required|string|max:255',
+        'customer_phone' => 'required|string|max:20',
+        'province' => 'required|string|max:255',
+        'district' => 'required|string|max:255',
+        'ward' => 'required|string|max:255',
+        'customer_address_detail' => 'required|string|max:255',
+        'payment_method' => 'required|string|max:50',
+    ]);
 
-        if ($product->stock < $validated['quantity']) {
-            return back()->withErrors(['quantity' => 'Số lượng sản phẩm không đủ'])->withInput();
-        }
-
-        $totalAmount = $product->price * $validated['quantity'];
-
-        // Tạo đơn hàng
-        $order = Order::create([
-            'user_id' => Auth::id(),
-            'order_date' => now(),
-            'total_amount' => $totalAmount,
-            'payment_method' => $validated['payment_method'],
-            'payment_status' => 'Chưa thanh toán',
-            'status' => 'Đang xử lý',
-            'shipping_address' => $validated['customer_address'],
-            'shipping_fee' => 0,
-            'note' => null,
-        ]);
-
-        // Chi tiết đơn hàng
-        OrderItem::create([
-            'order_id' => $order->id,
-            'product_id' => $product->id,
-            'quantity' => $validated['quantity'],
-            'price' => $product->price,
-        ]);
-
-        if ($validated['payment_method'] === 'MoMo') {
-            return $this->redirectToMomo($order);
-        }
-        if ($validated['payment_method'] === 'VNPay') {
-        return redirect()->route('vnpay.payment', ['order_id' => $order->id]);
-        }
-
-        // Thanh toán khi nhận
-        $product->stock -= $validated['quantity'];
-        $product->save();
-
-        $order->update([
-            'payment_status' => 'Chưa thanh toán',
-            'status' => 'Đang xử lý',
-        ]);
-
-        return redirect()->route('client.home')->with('success', 'Mua hàng thành công!');
+    // Kiểm tra tồn kho
+    if ($product->stock < $validated['quantity']) {
+        return back()->withErrors(['quantity' => 'Số lượng sản phẩm không đủ'])->withInput();
     }
+
+    // Ghép địa chỉ đầy đủ
+    $fullAddress = $validated['customer_address_detail'] . ', ' . $validated['ward'] . ', ' . $validated['district'] . ', ' . $validated['province'];
+
+    $totalAmount = $product->price * $validated['quantity'];
+
+    // Tạo đơn hàng
+    $order = Order::create([
+        'user_id' => Auth::id(),
+        'order_date' => now(),
+        'total_amount' => $totalAmount,
+        'payment_method' => $validated['payment_method'],
+        'payment_status' => 'Chưa thanh toán',
+        'status' => 'Đang xử lý',
+        'shipping_address' => $fullAddress,
+        'shipping_fee' => 0,
+        'note' => null,
+    ]);
+
+    // Chi tiết đơn hàng
+    OrderItem::create([
+        'order_id' => $order->id,
+        'product_id' => $product->id,
+        'quantity' => $validated['quantity'],
+        'price' => $product->price,
+    ]);
+
+    // Xử lý thanh toán
+    if ($validated['payment_method'] === 'MoMo') {
+        return $this->redirectToMomo($order);
+    }
+
+    if ($validated['payment_method'] === 'VNPay') {
+        return redirect()->route('vnpay.payment', ['order_id' => $order->id]);
+    }
+
+    // Thanh toán khi nhận hàng
+    $product->stock -= $validated['quantity'];
+    $product->save();
+
+    $order->update([
+        'payment_status' => 'Chưa thanh toán',
+        'status' => 'Đang xử lý',
+    ]);
+
+    return redirect()->route('client.home')->with('success', 'Mua hàng thành công!');
+}
+
 
 
 public function vnpay_payment(Request $request)

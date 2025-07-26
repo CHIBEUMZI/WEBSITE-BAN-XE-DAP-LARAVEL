@@ -1,75 +1,34 @@
-<div class="sidebar d-flex flex-column justify-content-between">
-    <div>
-      <h5>Trang Quản Lý</h5>
-      <a href="{{route('dashboard.index')}}"><i class="fas fa-home"></i> Trang chủ</a>
-      <a href="{{route('products.index')}}"><i class="fas fa-box"></i> Sản phẩm</a>
-      <a href="{{route('orders.index')}}"><i class="fas fa-receipt"></i> Đơn hàng</a>
-      <a href="{{route('user.index')}}"><i class="fas fa-users"></i> Người Dùng</a>
-      <a href="{{ route('AdminMaintenance.index') }}"><i class="fas fa-tools"></i> Bảo dưỡng xe</a>
-      <a href="{{route('employees.index')}}"><i class="fas fa-user-tie"></i> Nhân viên</a>
-      {{-- <a href="#"><i class="fas fa-chart-bar"></i> Báo cáo</a> --}}
-    </div>
-    <a href="{{ route('auth.logout') }}" class="logout-btn d-flex align-items-center justify-content-center gap-2">
-      <span>Đăng xuất</span><i class="fas fa-sign-out-alt"></i>
-    </a> 
-</div>
-<style>
-   body {
-      background-color: #f3f3f4;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-    }
+<!-- Sidebar -->
+<aside class="fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 flex flex-col justify-between py-6 px-4">
+  <div>
+    <h2 class="text-xl font-bold text-indigo-600 flex items-center gap-2 mb-4">
+      <i class="fas fa-smile text-indigo-500"></i> Trang quản lý
+    </h2>
+    <nav class="space-y-2">
+      <a href="{{ route('dashboard.index') }}" class="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-indigo-100 transition">
+        <i class="fas fa-home text-indigo-500"></i> <span>Trang chủ</span>
+      </a>
+      <a href="{{ route('products.index') }}" class="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-indigo-100 transition">
+        <i class="fas fa-box text-indigo-500"></i> <span>Sản phẩm</span>
+      </a>
+      <a href="{{ route('orders.index') }}" class="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-indigo-100 transition">
+        <i class="fas fa-receipt text-indigo-500"></i> <span>Đơn hàng</span>
+      </a>
+      <a href="{{ route('user.index') }}" class="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-indigo-100 transition">
+        <i class="fas fa-users text-indigo-500"></i> <span>Người dùng</span>
+      </a>
+      <a href="{{ route('AdminMaintenance.index') }}" class="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-indigo-100 transition">
+        <i class="fas fa-tools text-indigo-500"></i> <span>Bảo dưỡng xe</span>
+      </a>
+      <a href="{{ route('employees.index') }}" class="flex items-center gap-3 px-4 py-2 rounded-xl text-gray-700 hover:bg-indigo-100 transition">
+        <i class="fas fa-user-tie text-indigo-500"></i> <span>Nhân viên</span>
+      </a>
+    </nav>
+  </div>
 
-    .sidebar {
-      width: 220px;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      background-color: #2f4050;
-      padding: 20px;
-      color: #fff;
-      z-index: 1000;
-    }
-
-    .sidebar h5 {
-      font-weight: bold;
-      margin-bottom: 30px;
-      text-align: center;
-      color: #fff;
-    }
-
-    .sidebar a {
-      text-decoration: none;
-      color: #a7b1c2;
-      display: block;
-      padding: 10px 15px;
-      transition: 0.2s;
-      border-radius: 10px;
-    }
-
-    .sidebar a:hover,
-    .sidebar a.active {
-      color: #fff;
-      background-color: rgba(255, 255, 255, 0.1);
-      font-weight: bold;
-    }
-
-    .logout-btn {
-      display: inline-block;
-      padding: 20px 10px;
-      background-color: transparent;
-      color: #fff;
-      border: 1px solid #fff;
-      border-radius: 30px;
-      text-decoration: none;
-      transition: all 0.3s ease;
-    }
-
-    .logout-btn:hover {
-      background-color: red;
-      color: #2f4050;
-      font-weight: bold;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-</style>
+  <!-- Đăng xuất -->
+  <a href="{{ route('auth.logout') }}"
+     class="bg-red-500 text-white px-6 py-3 rounded-full text-center hover:bg-red-600 transition font-semibold flex items-center justify-center gap-2 mt-6">
+    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+  </a>
+</aside>

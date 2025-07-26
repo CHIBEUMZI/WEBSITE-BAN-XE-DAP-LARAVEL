@@ -1,97 +1,174 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xe Đạp Việt Nam</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
-  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh Toán Đơn Hàng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/vietnam-provinces@1.0.1/dist/vietnam-provinces.min.js"></script>
     @include('backend.dashboard.componet.head')
 </head>
-<body>
-   @include('client.component.header')
-<div class="max-w-3xl mx-auto py-12 px-4 bg-white rounded shadow">
-    <h1 class="text-3xl font-bold mb-6 text-blue-700">Mua hàng: {{ $product->name }}</h1>
+<body class="bg-gray-100">
+    @include('client.component.header')
 
-    <div class="flex mb-6">
-        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-48 h-48 object-cover rounded mr-6">
-        <div>
-            <p class="text-xl font-semibold mb-2">Giá: <span class="text-red-600">{{ number_format($product->price, 0, ',', '.') }} VND</span></p>
-            <p class="mb-4">Mô tả: {{ $product->description ?? 'Không có mô tả' }}</p>
-        </div>
-    </div>
-
-    <form action="{{route('product.processBuy' , ['id' => $product->id]) }}" method="POST" class="space-y-4">
+    <form action="{{ route('product.processBuy', ['id' => $product->id]) }}" method="POST" class="max-w-6xl mx-auto py-10 px-4 bg-white rounded shadow-md">
         @csrf
-        <div>
-            <label for="quantity" class="block font-semibold mb-1">Số lượng:</label>
-            <input type="number" id="quantity" name="quantity" min="1" value="{{ old('quantity', $quantity ?? 1) }}" required class="w-20 border rounded px-2 py-1">
-        </div>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Thanh Toán Đơn Hàng</h1>
 
-        <div>
-            <label for="customer_name" class="block font-semibold mb-1">Họ và tên:</label>
-            <input type="text" id="customer_name" name="customer_name" required class="w-full border rounded px-3 py-2">
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Trái: Thông tin sản phẩm + người nhận -->
+            <div class="md:col-span-2">
+                <h2 class="text-xl font-semibold mb-3">Thông tin giao hàng & Sản phẩm</h2>
 
-        <div>
-            <label for="customer_phone" class="block font-semibold mb-1">Số điện thoại:</label>
-            <input type="tel" id="customer_phone" name="customer_phone" required class="w-full border rounded px-3 py-2">
-        </div>
+                <!-- Sản phẩm -->
+                <div class="border rounded p-4 mb-6">
+                    <h3 class="text-lg font-semibold mb-4">Sản phẩm trong giỏ hàng</h3>
+                    <div class="flex items-center gap-4">
+                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-24 h-24 object-cover rounded">
+                        <div>
+                            <p class="font-medium">{{ $product->name }}</p>
+                            <label class="block mt-2">Số lượng:
+                                <input type="number" id="quantity" name="quantity" min="1" value="{{ old('quantity', $quantity ?? 1) }}" class="w-20 border rounded px-2 py-1 ml-2">
+                            </label>
+                            <p class="text-green-600 font-semibold mt-2" id="totalPrice">{{ number_format($product->price * ($quantity ?? 1), 0, ',', '.') }}đ</p>
+                        </div>
+                    </div>
+                </div>
 
-        <div>
-            <label for="customer_address" class="block font-semibold mb-1">Địa chỉ nhận hàng:</label>
-            <textarea id="customer_address" name="customer_address" rows="3" required class="w-full border rounded px-3 py-2"></textarea>
-        </div>
-        @php
-            $oldPayment = old('payment_method');
-        @endphp
+                <!-- Người nhận -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold">Thông tin người nhận</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" name="customer_name" placeholder="Họ và tên" required class="w-full border rounded px-3 py-2">
+                        <input type="tel" name="customer_phone" placeholder="Số điện thoại" required class="w-full border rounded px-3 py-2">
+                    </div>
 
-        <div class="mb-3 mt-4">
-            <label class="block mb-1 font-medium">Hình thức thanh toán</label>
-            <div class="space-y-2">
-                <label class="flex items-center gap-2">
-                    <input type="radio" name="payment_method" value="COD" class="mr-2" required {{ $oldPayment == 'COD' ? 'checked' : '' }}>
-                    <span>🛵 Thanh toán khi nhận hàng (COD)</span>
-                </label>
-                <label class="flex items-center gap-2">
-                    <input type="radio" name="payment_method" value="VNPay" class="mr-2" required {{ $oldPayment == 'VNPay' ? 'checked' : '' }}>
-                    <span>🏦 Thanh toán qua VNPay</span>
-                </label>
-                <label class="flex items-center gap-2">
-                    <input type="radio" name="payment_method" value="MoMo" class="mr-2" required {{ $oldPayment == 'MoMo' ? 'checked' : '' }}>
-                    <span>📱 Ví điện tử MoMo</span>
-                </label>
-                <label class="flex items-center gap-2">
-                    <input type="radio" name="payment_method" value="Zalopay" class="mr-2" required {{ $oldPayment == 'Zalopay' ? 'checked' : '' }}>
-                    <span>💰 Ví điện tử ZaloPay</span>
-                </label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <select id="province" name="province" required class="w-full border rounded px-3 py-2">
+                            <option value="">-- Chọn tỉnh/thành --</option>
+                        </select>
+                        <select id="district" name="district" required class="w-full border rounded px-3 py-2">
+                            <option value="">-- Chọn quận/huyện --</option>
+                        </select>
+                        <select id="ward" name="ward" required class="w-full border rounded px-3 py-2">
+                            <option value="">-- Chọn phường/xã --</option>
+                        </select>
+                    </div>
+
+                    <input type="text" name="customer_address_detail" placeholder="Địa chỉ chi tiết (số nhà, tên đường...)" required class="w-full border rounded px-3 py-2">
+                </div>
+            </div>
+
+            <!-- Phải: Phương thức thanh toán -->
+            <div class="border rounded p-6 bg-gray-50">
+                <h3 class="text-lg font-semibold mb-4">Hình thức thanh toán</h3>
+                @php $oldPayment = old('payment_method'); @endphp
+                <div class="space-y-3">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="payment_method" value="COD" required {{ $oldPayment == 'COD' ? 'checked' : '' }}>
+                        🛵 Thanh toán khi nhận hàng
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="payment_method" value="VNPay" required {{ $oldPayment == 'VNPay' ? 'checked' : '' }}>
+                        🏦 Qua VNPay
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="payment_method" value="MoMo" required {{ $oldPayment == 'MoMo' ? 'checked' : '' }}>
+                        📱 Ví MoMo
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="payment_method" value="Zalopay" required {{ $oldPayment == 'Zalopay' ? 'checked' : '' }}>
+                        💰 Ví ZaloPay
+                    </label>
+                </div>
+
+                <div class="mt-6">
+                    <button type="submit" class="w-full bg-green-600 text-white py-3 rounded font-semibold hover:bg-green-700 transition">Xác nhận thanh toán</button>
+                </div>
             </div>
         </div>
-
-        <p class="text-xl font-semibold mb-2">Tổng tiền: <span class="text-red-600" id="totalPrice">{{ number_format($product->price * $quantity, 0, ',', '.') }} VND</span></p>
-        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Xác nhận mua</button>
     </form>
+
+    @include('client.component.footer')
+
+    <!-- Script Tính Tổng -->
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const quantityInput = document.getElementById('quantity');
-        const totalPriceElement = document.getElementById('totalPrice');
-        const unitPrice = {{ $product->price }};
+        document.addEventListener("DOMContentLoaded", function () {
+            const quantityInput = document.getElementById('quantity');
+            const totalPriceElement = document.getElementById('totalPrice');
+            const unitPrice = {{ $product->price }};
 
-        function updateTotal() {
-            const qty = parseInt(quantityInput.value) || 1;
-            const total = qty * unitPrice;
+            function updateTotal() {
+                const qty = parseInt(quantityInput.value) || 1;
+                const total = qty * unitPrice;
+                totalPriceElement.textContent = new Intl.NumberFormat('vi-VN').format(total) + 'đ';
+            }
 
-            // Định dạng số có dấu chấm (.) ngăn cách hàng nghìn
-            const formatted = new Intl.NumberFormat('vi-VN').format(total) + ' VND';
-            totalPriceElement.textContent = formatted;
-        }
+            quantityInput.addEventListener('input', updateTotal);
+        });
+    </script>
 
-        quantityInput.addEventListener('input', updateTotal);
-    });
-</script>
-</div>
- @include('client.component.footer')
+    <!-- Script Địa Lý -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const provinceSelect = document.getElementById("province");
+            const districtSelect = document.getElementById("district");
+            const wardSelect = document.getElementById("ward");
+
+            fetch("https://provinces.open-api.vn/api/?depth=1")
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(province => {
+                        const opt = document.createElement("option");
+                        opt.value = province.name;
+                        opt.textContent = province.name;
+                        provinceSelect.appendChild(opt);
+                    });
+                });
+
+            provinceSelect.addEventListener("change", function () {
+                const selectedProvince = this.options[this.selectedIndex].text;
+                districtSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+                wardSelect.innerHTML = '<option value="">-- Chọn phường/xã --</option>';
+
+                fetch("https://provinces.open-api.vn/api/?depth=2")
+                    .then(res => res.json())
+                    .then(data => {
+                        const province = data.find(p => p.name === selectedProvince);
+                        if (province) {
+                            province.districts.forEach(district => {
+                                const opt = document.createElement("option");
+                                opt.value = district.name;
+                                opt.textContent = district.name;
+                                districtSelect.appendChild(opt);
+                            });
+                        }
+                    });
+            });
+
+            districtSelect.addEventListener("change", function () {
+                const selectedDistrict = this.options[this.selectedIndex].text;
+                wardSelect.innerHTML = '<option value="">-- Chọn phường/xã --</option>';
+
+                fetch("https://provinces.open-api.vn/api/?depth=3")
+                    .then(res => res.json())
+                    .then(data => {
+                        const province = data.find(p => p.name === provinceSelect.value);
+                        if (!province) return;
+
+                        const district = province.districts.find(d => d.name === selectedDistrict);
+                        if (!district) return;
+
+                        district.wards.forEach(ward => {
+                            const opt = document.createElement("option");
+                            opt.value = ward.name;
+                            opt.textContent = ward.name;
+                            wardSelect.appendChild(opt);
+                        });
+                    });
+            });
+        });
+    </script>
 </body>
 </html>

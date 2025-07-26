@@ -1,44 +1,62 @@
 @extends('backend.dashboard.layout')
+
 @section('content')
-    <div class="search-bar mb-4">
-        <form action="{{ route('AdminMaintenance.index') }}" method="GET">
-            <input type="text" name="keyword" class="search-input form-control" placeholder="🔍 Tìm kiếm bằng tên khách hàng, số điện thoại, SKU..." value="{{ request('keyword') }}">
-        </form>
-    </div>
-    <table class="table align-middle mb-0 bg-white">
-        <thead class="bg-light">
+
+<!-- Tìm kiếm -->
+<div class="mb-4">
+    <form action="{{ route('AdminMaintenance.index') }}" method="GET" class="max-w-xl">
+        <input type="text"
+            name="keyword"
+            placeholder="🔍 Tìm kiếm bằng tên khách hàng, số điện thoại, SKU..."
+            value="{{ request('keyword') }}"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+    </form>
+</div>
+
+<!-- Bảng dữ liệu bảo trì -->
+<div class="w-full overflow-x-auto bg-white shadow rounded-xl">
+    <table class="min-w-[1100px] w-full text-sm text-left text-gray-700 divide-y divide-gray-200">
+        <thead class="bg-indigo-50 text-gray-700 font-semibold">
             <tr>
-                <th>ID</th>
-                <th>Customer Name</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Product SKU</th>
-                <th>Issue description</th>
-                <th>preferred date</th>
-                <th>Address</th>
-                <th>Trạng thái</th>
-                <th>Nhân viên</th>
-                <th>Action</th>
+                <th class="px-4 py-3">ID</th>
+                <th class="px-4 py-3">Khách hàng</th>
+                <th class="px-4 py-3">SĐT</th>
+                <th class="px-4 py-3">Email</th>
+                <th class="px-4 py-3">SKU</th>
+                <th class="px-4 py-3">Mô tả lỗi</th>
+                <th class="px-4 py-3">Ngày hẹn</th>
+                <th class="px-4 py-3">Địa chỉ</th>
+                <th class="px-4 py-3">Trạng thái</th>
+                <th class="px-4 py-3">Nhân viên</th>
+                <th class="px-4 py-3">Thao tác</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-gray-100">
             @if(isset($maintenances) && is_iterable($maintenances))
-                @foreach ($maintenances as $key => $val)
-                    <tr>
-                        <td class="text-center">{{ $val->id }}</td>
-                        <td>{{ $val->customer_name }}</td>
-                        <td>{{ $val->phone }}</td>
-                        <td>{{ $val->email }}</td>
-                        <td>{{ $val->product_sku }}</td>
-                        <td>{{ $val->issue_description }}</td>
-                        <td>{{ $val->preferred_date }}</td>
-                        <td>{{ $val->address }}</td>
-                        <td>{{ $val->status }}</td>
-                        <td>
+                @foreach ($maintenances as $val)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-center">{{ $val->id }}</td>
+                        <td class="px-4 py-3">{{ $val->customer_name }}</td>
+                        <td class="px-4 py-3">{{ $val->phone }}</td>
+                        <td class="px-4 py-3">{{ $val->email }}</td>
+                        <td class="px-4 py-3">{{ $val->product_sku }}</td>
+                        <td class="px-4 py-3">{{ $val->issue_description }}</td>
+                        <td class="px-4 py-3">{{ $val->preferred_date }}</td>
+                        <td class="px-4 py-3">{{ $val->address }}</td>
+                        <td class="px-2 py-3">
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                {{ $val->status === 'Đang xử lý' ? 'bg-yellow-100 text-yellow-600' :
+                                   ($val->status === 'Hoàn thành' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600') }}">
+                                {{ $val->status }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
                             <form action="{{ route('AdminMaintenance.assignEmployee', $val->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
-                                <select name="employee_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <select name="employee_id"
+                                    class="w-full border border-gray-300 text-sm rounded-lg px-2 py-1 focus:ring-indigo-500"
+                                    onchange="this.form.submit()">
                                     <option value="">-- Chọn nhân viên --</option>
                                     @foreach ($employees as $employee)
                                         <option value="{{ $employee->id }}" {{ $val->employee_id == $employee->id ? 'selected' : '' }}>
@@ -48,78 +66,43 @@
                                 </select>
                             </form>
                         </td>
-                        <td>
-                        {{-- Nút thay đổi trang thái bảo trì--}}
-                        @if($val->status ==='Đang xử lý')
-                                <form action="{{ route('maintenance.comfirm', $val->id) }}" method="POST" style="display:inline;">
+                        <td class="px-4 py-3 space-y-1">
+                            @if($val->status === 'Đang xử lý')
+                                <form action="{{ route('maintenance.comfirm', $val->id) }}" method="POST"
+                                    onsubmit="return confirm('Bạn có chắc muốn xác nhận đã hoàn thành không?')">
                                     @csrf
                                     <input type="hidden" name="action" value="pending">
-                                    <button type="submit" class="btn btn-primary btn-sm"
-                                        onclick="return confirm('Bạn có chắc muốn xác nhận đã hoàn thành không?')">
-                                        Đã hoàn thành
+                                    <button type="submit"
+                                        class="w-full bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded-lg">
+                                        Hoàn thành
                                     </button>
                                 </form>
-                                <form action="{{ route('maintenance.comfirm', $val->id) }}" method="POST" style="display:inline;">
+
+                                <form action="{{ route('maintenance.comfirm', $val->id) }}" method="POST"
+                                    onsubmit="return confirm('Bạn có chắc muốn hủy yêu cầu này không?')">
                                     @csrf
                                     <input type="hidden" name="action" value="cancel">
-                                    <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Bạn có chắc muốn hủy yêu cầu này không không?')">
-                                        Hủy yêu cầu
+                                    <button type="submit"
+                                        class="w-full bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-lg">
+                                        Hủy
                                     </button>
                                 </form>
-                                @endif
+                            @endif
                         </td>
                     </tr>
                 @endforeach
             @else
                 <tr>
-                    <td colspan="10" class="text-center">Không có dữ liệu người dùng</td>
+                    <td colspan="11" class="text-center py-4 text-gray-500 italic">Không có dữ liệu người dùng</td>
                 </tr>
             @endif
         </tbody>
     </table>
-    <div class="mt-3 d-flex justify-content-center">
-        <div class="w-auto">
-            {{ $maintenances->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
-        </div>
-    </div>
+</div>
+
+<!-- Phân trang -->
+<div class="mt-6 flex justify-center">
+    {{ $maintenances->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
+</div>
+
 @endsection
-<style>
-.search-input {
-        max-width: 500px;
-    }
-.pagination {
-    font-size: 13px;
-    padding: 0;
-    margin: 0;
-    justify-content: center;
-}
-
-.page-item {
-    margin: 0 2px;
-}
-
-.page-link {
-    padding: 4px 10px;
-    font-size: 12px;
-    border-radius: 6px;
-    color: #333;
-    border: 1px solid #dee2e6;
-}
-
-.page-link:hover {
-    background-color: #f0f0f0;
-    color: #000;
-}
-
-.page-item.active .page-link {
-    background-color: #cce5ff;
-    border-color: #b8daff;
-    color: #000;
-}
-.main-content {
-      margin-left: 220px;
-      padding: 30px;
-      transition: all 0.3s ease;
-    }
-</style>

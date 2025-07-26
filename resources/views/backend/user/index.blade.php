@@ -1,63 +1,74 @@
 @extends('backend.dashboard.layout')
+
 @section('content')
-    <div class="search-bar mb-4">
-        <form action="{{ route('user.index') }}" method="GET">
-            <input type="text" name="keyword" class="search-input form-control" placeholder="🔍 Tìm kiếm..." value="{{ request('keyword') }}">
-        </form>
-    </div>
-    <table class="table align-middle mb-0 bg-white">
-        <thead class="bg-light">
+
+<!-- Tìm kiếm -->
+<div class="mb-4">
+    <form action="{{ route('user.index') }}" method="GET" class="max-w-xl">
+        <input type="text" name="keyword"
+               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+               placeholder="🔍 Tìm kiếm..." value="{{ request('keyword') }}">
+    </form>
+</div>
+
+<!-- Bảng người dùng -->
+<div class="w-full overflow-x-auto rounded-xl shadow bg-white">
+    <table class="min-w-[1000px] w-full text-sm text-left text-gray-700">
+        <thead class="bg-indigo-50 text-gray-700 font-semibold">
             <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Birthday</th>
-                <th>Address</th>
-                <th>Role</th>
-                <th>Email</th>
-                <th>Created At</th>
-                <th>Updated At</th>
-                <th>Action</th>
+                <th class="px-4 py-3">ID</th>
+                <th class="px-4 py-3">Tên</th>
+                <th class="px-4 py-3">SĐT</th>
+                <th class="px-4 py-3">Ngày sinh</th>
+                <th class="px-4 py-3">Địa chỉ</th>
+                <th class="px-4 py-3">Quyền</th>
+                <th class="px-4 py-3">Email</th>
+                <th class="px-4 py-3">Tạo lúc</th>
+                <th class="px-4 py-3">Thao tác</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-gray-100">
             @if(isset($users) && is_iterable($users))
-                @foreach ($users as $key => $val)
-                    <tr>
-                        <td class="text-center">{{ $val->id }}</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <img src="{{ asset('storage/' . $val->image) }}" alt="" style="width: 45px; height: 45px" class="rounded-circle" />
-                                <div class="ms-3">
-                                    <p class="fw-bold mb-1">{{ $val->name }}</p>
-                                </div>
+                @foreach ($users as $val)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3 text-center">{{ $val->id }}</td>
+                        <td class="px-4 py-3 flex items-center gap-3">
+                            <img src="{{ asset('storage/' . $val->image) }}" alt="Ảnh"
+                                 class="w-10 h-10 rounded-full object-cover" />
+                            <div>
+                                <p class="font-medium">{{ $val->name }}</p>
                             </div>
                         </td>
-                        <td>{{ $val->phone }}</td>
-                        <td>{{ $val->birthday }}</td>
-                        <td>{{ $val->address }}</td>
-                        <td>{{ $val->role }}</td>
-                        <td>{{ $val->email }}</td>
-                        <td>{{ $val->created_at }}</td>
-                        <td>{{ $val->updated_at }}</td>
-                        <td>
-                        {{-- Nút thay đổi role tài khoản --}}
+                        <td class="px-4 py-3">{{ $val->phone }}</td>
+                        <td class="px-4 py-3">{{ $val->birthday }}</td>
+                        <td class="px-4 py-3">{{ $val->address }}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                {{ $val->role === 'Admin' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600' }}">
+                                {{ $val->role }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">{{ $val->email }}</td>
+                        <td class="px-4 py-3 text-xs text-gray-500">{{ $val->created_at }}</td>
+                        <td class="px-4 py-3 space-y-1 min-w-[120px]">
                             @if($val->role == 'User')
-                                <form action="{{ route('users.changeRole', $val->id) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('users.changeRole', $val->id) }}" method="POST"
+                                      onsubmit="return confirm('Bạn có chắc muốn nâng cấp tài khoản này lên Admin không?')">
                                     @csrf
                                     <input type="hidden" name="action" value="upgrade">
-                                    <button type="submit" class="btn btn-primary btn-sm"
-                                        onclick="return confirm('Bạn có chắc muốn nâng cấp tài khoản này lên Admin không?')">
-                                        Nâng cấp tài khoản
+                                    <button type="submit"
+                                            class="w-full bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded-lg">
+                                        Nâng cấp
                                     </button>
                                 </form>
                             @else
-                                <form action="{{ route('users.changeRole', $val->id) }}" method="POST" style="display:inline;">
+                                <form action="{{ route('users.changeRole', $val->id) }}" method="POST"
+                                      onsubmit="return confirm('Bạn có chắc muốn hạ cấp tài khoản này xuống User không?')">
                                     @csrf
                                     <input type="hidden" name="action" value="downgrade">
-                                    <button type="submit" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Bạn có chắc muốn hạ cấp tài khoản này xuống User không?')">
-                                        Hạ cấp tài khoản
+                                    <button type="submit"
+                                            class="w-full bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-lg">
+                                        Hạ cấp
                                     </button>
                                 </form>
                             @endif
@@ -66,53 +77,16 @@
                 @endforeach
             @else
                 <tr>
-                    <td colspan="10" class="text-center">Không có dữ liệu người dùng</td>
+                    <td colspan="10" class="text-center py-4 text-gray-500 italic">Không có dữ liệu người dùng</td>
                 </tr>
             @endif
         </tbody>
     </table>
-    <div class="mt-3 d-flex justify-content-center">
-        <div class="w-auto">
-            {{ $users->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
-        </div>
-    </div>
+</div>
+
+<!-- Phân trang -->
+<div class="mt-6 flex justify-center">
+    {{ $users->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
+</div>
+
 @endsection
-<style>
-.search-input {
-        max-width: 500px;
-    }
-.pagination {
-    font-size: 13px;
-    padding: 0;
-    margin: 0;
-    justify-content: center;
-}
-
-.page-item {
-    margin: 0 2px;
-}
-
-.page-link {
-    padding: 4px 10px;
-    font-size: 12px;
-    border-radius: 6px;
-    color: #333;
-    border: 1px solid #dee2e6;
-}
-
-.page-link:hover {
-    background-color: #f0f0f0;
-    color: #000;
-}
-
-.page-item.active .page-link {
-    background-color: #cce5ff;
-    border-color: #b8daff;
-    color: #000;
-}
-.main-content {
-      margin-left: 220px;
-      padding: 30px;
-      transition: all 0.3s ease;
-    }
-</style>

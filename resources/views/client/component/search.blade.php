@@ -19,9 +19,9 @@
                     <i class="fas fa-times"></i> Xóa lọc
                 </a>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     @foreach ($products as $product)
-                        <div class="relative bg-white p-4 rounded-lg shadow-md hover:shadow-xl hover:scale-105 transform transition duration-300 text-center cursor-pointer flex flex-col justify-between h-full">
+                        <div class="relative bg-white p-4 rounded-xl shadow-sm group hover:shadow-lg hover:scale-105 transform transition duration-300 text-center flex flex-col justify-between h-full">
                             {{-- Ribbon SALE --}}
                             @if($product->discount > 0)
                                 <div class="absolute top-0 left-0 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-br-lg z-10">
@@ -39,13 +39,13 @@
                                     @endif
                                 </div>
                             </div>
-                            <a href="{{ route('product.details', ['id' => $product->id]) }}" class="mt-3 inline-block bg-blue-600 text-white text-sm px-3 py-1.5 rounded-full hover:bg-blue-700 transition">
+                            <a href="{{ route('product.details', ['id' => $product->id]) }}" class="mt-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-full hover:from-indigo-600 hover:to-blue-600 transition-all shadow-md">
                                 Mua ngay
                             </a>
                         </div>
                     @endforeach
                 </div>
-                <div class="mt-8">
+                <div class="mt-10 flex justify-center">
                     {{ $products->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
                 </div>
             </div>

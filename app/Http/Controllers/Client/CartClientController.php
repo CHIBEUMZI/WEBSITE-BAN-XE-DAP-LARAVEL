@@ -83,10 +83,13 @@ class CartClientController extends Controller
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_phone' => 'required|string|max:20',
-            'customer_address' => 'required|string|max:500',
-            'payment_method' => 'required|string|max:500',
+            'province' => 'required|string|max:255',
+            'district' => 'required|string|max:255',
+            'ward' => 'required|string|max:255',
+            'customer_address_detail' => 'required|string|max:255',
+            'payment_method' => 'required|string|max:50',
         ]);
-
+        $fullAddress = $validated['customer_address_detail'] . ', ' . $validated['ward'] . ', ' . $validated['district'] . ', ' . $validated['province'];
         $totalAmount = 0;
 
         foreach ($cartItems as $item) {
@@ -105,7 +108,7 @@ class CartClientController extends Controller
             'payment_method' => $validated['payment_method'],
             'payment_status' => 'Chưa thanh toán',
             'status' => 'Chờ thanh toán',
-            'shipping_address' => $validated['customer_address'],
+            'shipping_address' => $fullAddress,
             'shipping_fee' => 0,
             'note' => null,
         ]);

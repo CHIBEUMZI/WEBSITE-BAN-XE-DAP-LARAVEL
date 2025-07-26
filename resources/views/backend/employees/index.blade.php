@@ -1,63 +1,83 @@
 @extends('backend.dashboard.layout')
+
 @section('content')
-<div class="search-bar mb-4">
-    <form action="{{ route('employees.index') }}" method="GET">
-        <input type="text" name="keyword" class="search-input form-control" placeholder="🔍 Tìm kiếm..." value="{{ request('keyword') }}">
+<!-- Tìm kiếm -->
+<div class="mb-4">
+    <form action="{{ route('employees.index') }}" method="GET" class="max-w-md">
+        <input
+            type="text"
+            name="keyword"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="🔍 Tìm kiếm..."
+            value="{{ request('keyword') }}">
     </form>
 </div>
-    <a href="{{route('employees.create')}}" class="btn btn-sm btn-info">Add New Employees</a>
-    <table class="table align-middle mb-0 bg-white">
-        <thead class="bg-light">
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Phone</th>
-                <th>Position</th>
-                <th>Address</th>
-                <th>Action</th>
+
+<!-- Thêm mới -->
+<a href="{{ route('employees.create') }}"
+    class="inline-block mb-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">
+    ➕ Thêm nhân viên
+</a>
+
+<!-- Bảng nhân viên -->
+<div class="overflow-x-auto bg-white shadow rounded-xl">
+    <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-indigo-50">
+            <tr class="text-left text-gray-700 font-semibold">
+                <th class="px-6 py-3">ID</th>
+                <th class="px-6 py-3">Tên</th>
+                <th class="px-6 py-3">Số điện thoại</th>
+                <th class="px-6 py-3">Chức vụ</th>
+                <th class="px-6 py-3">Địa chỉ</th>
+                <th class="px-6 py-3">Hành động</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-gray-200">
             @if(isset($employees) && is_iterable($employees))
-                @foreach ($employees as $key => $val)
-                    <tr>
-                        <td class="text-center">{{ $val->id }}</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <img src="{{ asset('storage/' . $val->image) }}" alt="" style="width: 100px; height: 100px" class="rounded-rectangle" />
-                                <div class="ms-3">
-                                    <p class="fw-bold mb-1">{{ $val->name }}</p>
-                                </div>
+                @foreach ($employees as $val)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-center">{{ $val->id }}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-4">
+                                <img src="{{ asset('storage/' . $val->image) }}"
+                                     alt="Ảnh"
+                                     class="w-16 h-16 object-cover rounded-xl border border-gray-300" />
+                                <span class="font-medium">{{ $val->name }}</span>
                             </div>
                         </td>
-                        <td>{{ $val->phone }}</td>
-                        <td>{{ $val->position }}</td>
-                        <td>{{ $val->address }}</td>
-                        <td>
-                            <a href="{{ route('employees.edit', $val->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                            <form action="{{ route('employees.destroy', $val->id) }}" method="POST" class="d-inline">
+                        <td class="px-6 py-4">{{ $val->phone }}</td>
+                        <td class="px-6 py-4">{{ $val->position }}</td>
+                        <td class="px-6 py-4">{{ $val->address }}</td>
+                        <td class="px-6 py-4">
+                            <a href="{{ route('employees.edit', $val->id) }}"
+                               class="inline-block text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded mr-1">
+                                ✏️ Sửa
+                            </a>
+                            <form action="{{ route('employees.destroy', $val->id) }}"
+                                  method="POST"
+                                  class="inline-block"
+                                  onsubmit="return confirm('Bạn có chắc muốn xoá không?')">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xoá không?')">Delete</button>
+                                <button type="submit"
+                                        class="text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded">
+                                    🗑️ Xoá
+                                </button>
                             </form>
                         </td>
                     </tr>
                 @endforeach
             @else
                 <tr>
-                    <td colspan="10" class="text-center">Không có dữ liệu người dùng</td>
+                    <td colspan="6" class="text-center py-4 text-gray-500 italic">Không có dữ liệu nhân viên</td>
                 </tr>
             @endif
         </tbody>
     </table>
-    <div class="mt-3 d-flex justify-content-center">
-        <div class="w-auto">
-            {{ $employees->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
-        </div>
-    </div>
+</div>
+
+<!-- Phân trang -->
+<div class="mt-6 flex justify-center">
+    {{ $employees->appends(request()->except('page'))->links('pagination::bootstrap-4') }}
+</div>
 @endsection
-<style>
-    .search-input {
-       max-width: 500px;
-    }
-</style>
