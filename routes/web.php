@@ -87,6 +87,7 @@ Route::get('/home', [ProductClientController::class, 'index'])->name('client.hom
 
 // CLIENT PRODUCT 
 Route::get('/find', [ProductClientController::class, 'find'])->name('client.products.index');
+Route::get('/top-sale', [ProductClientController::class, 'topSale'])->name('top.sale');
 Route::get('/details/{id}', [ProductClientController::class, 'details'])->name('product.details');
 Route::get('/buy/{id}', [ProductClientController::class, 'buy'])->name('product.buy');
 Route::post('/buy/{id}', [ProductClientController::class, 'processBuy'])->name('product.processBuy');

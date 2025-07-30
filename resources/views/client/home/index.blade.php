@@ -1,6 +1,62 @@
 @extends('client.layout')
 
 @section('content')
+<section class="bg-cover bg-center bg-no-repeat py-12" style="background-image: url('{{ asset('images/Banner/banner-summer.jpg') }}');">
+  <div class="bg-white/80 py-4 rounded-xl max-w-7xl mx-auto px-4 shadow-lg">
+    {{-- Tiêu đề --}}
+    <div class="text-center mb-8">
+      <h2 class="text-4xl font-bold text-orange-600 drop-shadow tracking-wide">
+        🔥 BÃO SALE CUỐI HÈ – SĂN DEAL CỰC CHÁY 🔥
+      </h2>
+      <p class="text-gray-700 mt-2 text-sm">Chớp cơ hội sở hữu sản phẩm yêu thích với giá cực tốt!</p>
+
+      <div class="inline-block mt-4 bg-red-600 text-white px-6 py-2 text-lg font-bold rounded-full shadow">
+        DEAL HOT HÔM NAY
+      </div>
+    </div>
+
+    {{-- Danh sách sản phẩm --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      @if(isset($topsales))
+        @forelse($topsales as $product)
+          <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 relative group">
+            {{-- Badge giảm giá --}}
+            <div class="absolute top-2 left-2 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded z-10">
+              -{{ $product->discount }}%
+            </div>
+
+            {{-- Hình ảnh --}}
+            <div class="overflow-hidden rounded-t-xl bg-gray-50">
+              <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
+                   class="w-full h-48 object-contain group-hover:scale-105 transition-transform duration-300">
+            </div>
+
+            {{-- Thông tin --}}
+            <div class="p-4 text-center">
+              <h3 class="text-base font-semibold text-gray-800 mb-1 truncate">{{ $product->name }}</h3>
+              <p class="text-sm text-gray-500 mb-2">{{ $product->brand }} | {{ $product->category }}</p>
+              <div class="flex justify-center items-center space-x-2">
+                <span class="text-red-600 font-bold text-lg">{{ number_format($product->price, 0, ',', '.') }}₫</span>
+                <span class="line-through text-gray-400 text-sm">{{ number_format($product->original_price, 0, ',', '.') }}₫</span>
+              </div>
+              <a href="{{ route('product.details', ['id' => $product->id]) }}"
+                 class="mt-4 inline-block bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-semibold px-5 py-2 rounded-full shadow hover:brightness-110 transition-all">
+                Mua ngay
+              </a>
+            </div>
+          </div>
+        @empty
+          <p class="col-span-full text-center text-gray-500 text-lg py-8">
+            Không có sản phẩm nào giảm giá từ 15% trở lên.
+          </p>
+        @endforelse
+      @endif
+    </div>
+  </div>
+</section>
+
+
+
 <section class="py-12 bg-gray-100">
     @if(isset($categories) && $categories->isNotEmpty())
         @foreach ($categories as $category)
