@@ -231,9 +231,14 @@ function sendMessage() {
     input.value = '';
     showTyping();
 
+    const userId = "{{ optional(Auth::user())->id}}";
+    console.log("User ID:", userId);
     socket.emit("user_uttered", {
         message: message,
-        session_id: sessionId
+        session_id: sessionId,
+        metadata: {
+            user_id: userId || null // Optional: include user ID if available
+        }
     });
 }
 
