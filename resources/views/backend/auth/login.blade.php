@@ -18,40 +18,17 @@
   <!-- MDBootstrap JS -->
   <script src="bootstrap/js/mdb.min.js"></script>
 
-  <!-- Chart.js (nếu cần cho thống kê) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <style>
     body {
       font-family: 'Montserrat', sans-serif;
     }
 
-    .card {
-      border-radius: 1rem;
-    }
-
-    .form-control {
-      padding: 10px 12px;
-      font-size: 15px;
-    }
-
-    label {
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-
     .error-message {
       color: red;
       font-size: 12px;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-
-    input[type="password"] {
-      font-family: Arial, sans-serif;
-    }
-
-    .btn-block {
-      width: 100%;
+      display: block;
+      min-height: 14px;
+      margin-top: 4px;
     }
   </style>
 </head>
@@ -59,20 +36,23 @@
 <body>
   <section class="vh-100" style="background-color: #9A616D;">
     <div class="container py-5 h-100">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col col-xl-10">
+      <div class="row justify-content-center align-items-center h-100">
+        <div class="col-xl-10">
+
           <div class="card shadow-lg">
             <div class="row g-0">
-              <!-- Hình ảnh bên trái -->
+
+              <!-- Image -->
               <div class="col-md-6 col-lg-5 d-none d-md-block" style="margin-top: 100px;">
                 <img src="img/bikeLogin.webp" alt="login form" class="img-fluid"
-                  style="border-radius: 1rem 0 0 1rem;" />
+                     style="border-radius: 1rem 0 0 1rem;" />
               </div>
 
-              <!-- Form đăng nhập -->
+              <!-- Form -->
               <div class="col-md-6 col-lg-7 d-flex align-items-center">
                 <div class="card-body p-4 p-lg-5 text-black">
-                  <form action="{{ route('auth.login') }}" method="POST">
+
+                  <form id="loginForm" action="{{ route('auth.login') }}" method="POST">
                     @csrf
 
                     <div class="d-flex align-items-center mb-3 pb-1">
@@ -80,50 +60,85 @@
                       <span class="h1 fw-bold mb-0">ĐAM MÊ BẤT TẬN</span>
                     </div>
 
-                    <h5 class="fw-normal mb-3 pb-2" style="letter-spacing: 1px;">Đăng nhập tài khoản</h5>
+                    <h5 class="fw-normal mb-3 pb-2">Đăng nhập tài khoản</h5>
 
                     <!-- Email -->
                     <div class="mb-3">
-                      <label for="email" class="form-label">Email</label>
+                      <label class="form-label">Email</label>
                       <input type="text" class="form-control" id="email" name="email"
-                        placeholder="Nhập email" value="{{ old('email') }}" required>
-                      @if ($errors->has('email'))
-                        <span class="error-message">{{ $errors->first('email') }}</span>
-                      @endif
+                             placeholder="Nhập email" value="{{ old('email') }}">
+                      <span class="error-message">
+                        @if ($errors->has('email')) {{ $errors->first('email') }} @endif
+                      </span>
                     </div>
 
-                    <!-- Mật khẩu -->
+                    <!-- Password -->
                     <div class="mb-3">
-                      <label for="password" class="form-label">Mật khẩu</label>
+                      <label class="form-label">Mật khẩu</label>
                       <input type="password" class="form-control" id="password" name="password"
-                        placeholder="Nhập mật khẩu" required>
-                      @if ($errors->has('password'))
-                        <span class="error-message">{{ $errors->first('password') }}</span>
-                      @endif
+                             placeholder="Nhập mật khẩu">
+                      <span class="error-message">
+                        @if ($errors->has('password')) {{ $errors->first('password') }} @endif
+                      </span>
                     </div>
 
-                    <!-- Nút đăng nhập -->
+                    <!-- Button -->
                     <div class="mb-3">
-                      <button class="btn btn-dark btn-lg btn-block" type="submit"
-                        onclick="this.innerText='Đang đăng nhập...'">Đăng nhập</button>
+                      <button class="btn btn-dark btn-lg btn-block" type="submit">Đăng nhập</button>
                     </div>
 
-                    <!-- Link phụ -->
                     <div class="mt-3">
                       <a class="small text-muted" href="{{ route('password.form') }}">Quên mật khẩu?</a>
                       <p class="mb-2 mt-2" style="color: #393f81;">Chưa có tài khoản?
                         <a href="{{ route('register.form') }}" style="color: #393f81;">Đăng ký ngay</a>
                       </p>
                     </div>
+
                   </form>
+
                 </div>
-              </div> <!-- end form -->
+              </div>
+
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </section>
+
+  <!-- Validation Script -->
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+
+      // Clear all old error messages
+      document.querySelectorAll(".error-message").forEach(el => el.innerText = "");
+
+      let valid = true;
+
+      // Validate email
+      const email = document.getElementById("email");
+      const emailError = email.parentElement.querySelector(".error-message");
+
+      if (email.value.trim() === "") {
+        emailError.innerText = "Vui lòng nhập email";
+        valid = false;
+      }
+
+      // Validate password
+      const password = document.getElementById("password");
+      const passwordError = password.parentElement.querySelector(".error-message");
+
+      if (password.value.trim() === "") {
+        passwordError.innerText = "Vui lòng nhập mật khẩu";
+        valid = false;
+      }
+
+      // Stop form submit if invalid
+      if (!valid) e.preventDefault();
+    });
+  </script>
+
 </body>
 
 </html>
