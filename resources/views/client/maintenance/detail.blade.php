@@ -13,6 +13,7 @@
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
 
   @include('client.component.header')
+  @include('client.component.chatbot')
 
  <main class="container mx-auto px-4 py-8 flex-grow">
   <h2 class="text-3xl font-semibold text-blue-700 mb-6 border-b-2 border-blue-400 pb-2">

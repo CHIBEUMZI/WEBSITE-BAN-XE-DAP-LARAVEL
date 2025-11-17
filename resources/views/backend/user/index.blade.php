@@ -33,8 +33,9 @@
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-3 text-center">{{ $val->id }}</td>
                         <td class="px-4 py-3 flex items-center gap-3">
-                            <img src="{{ asset('storage/' . $val->image) }}" alt="Ảnh"
-                                 class="w-10 h-10 rounded-full object-cover" />
+                        <img src="{{ !empty($val->image) ? asset('storage/' . $val->image) : asset('images/Avatar/default.jpg') }}" 
+                            alt="Ảnh"
+                            class="w-10 h-10 rounded-full object-cover" />
                             <div>
                                 <p class="font-medium">{{ $val->name }}</p>
                             </div>

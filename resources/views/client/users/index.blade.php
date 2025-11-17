@@ -67,7 +67,7 @@
     </div>
 
     <div class="space-y-4 text-center">
-      <img src="{{ $user->image ? asset('storage/' . $user->image) : 'https://via.placeholder.com/120/0070f0/ffffff?text=AVT' }}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto object-cover border">
+      <img src="{{ $user->image ? asset('storage/' . $user->image) : asset('images/Avatar/default.jpg') }}" alt="Avatar" class="w-32 h-32 rounded-full mx-auto object-cover border">
       <div>
         <input type="file" name="image" class="block w-full text-sm text-gray-500
         file:mr-4 file:py-2 file:px-4

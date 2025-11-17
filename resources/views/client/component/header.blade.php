@@ -33,10 +33,12 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary py-3 shadow-sm sticky-top z-50">
   <div class="container d-flex justify-content-between align-items-center flex-wrap gap-3">
     <!-- Logo -->
-    <a class="navbar-brand d-flex align-items-center no-underline" href="{{ route('client.home') }}">
-      <img src="{{ asset('images/Logo/Logo.png') }}" alt="Logo" width="45" height="45" class="me-2">
-      <span class="fw-bold fs-4 text-white">xedap.com</span>
-    </a>
+  <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ route('client.home') }}">
+    <img src="{{ asset('images/Logo/Logo.png') }}" alt="Logo"
+        width="45" height="45"
+        class="rounded border border-white shadow-sm object-contain">
+    <span class="fw-bold fs-4 text-white">xedap.com</span>
+  </a>
     <!-- Search -->
     <form method="GET" action="{{ route('client.products.index') }}" class="modern-search-bar flex-grow-1" role="search">
       <div class="search-box">
@@ -84,7 +86,7 @@
   <!-- Avatar + Dropdown -->
   <div class="relative">
     <button id="userMenuButton" class="flex items-center gap-2 focus:outline-none">
-      <img src="{{ Auth::user()->image ? asset('storage/' . Auth::user()->image) : asset('images/default-avatar.png') }}"
+      <img src="{{ Auth::user()->image ? asset('storage/' . Auth::user()->image) : asset('images/Avatar/default.jpg') }}"
         alt="Avatar"
         class="w-9 h-9 rounded-full object-cover border-2 border-white shadow" />
       <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
