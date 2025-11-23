@@ -48,7 +48,7 @@
 
     <!-- Trạng thái sản phẩm -->
     @if($product->stock == 0)
-      <p class="text-red-600 font-semibold">Hết hàng</p>
+      <p class="text-red-600 font-semibold" id="outOfStockLabel">Hết hàng</p>
     @else
       <p>Số lượng còn lại: <span class="font-semibold">{{ $product->stock }}</span></p>
       <p class="text-green-600 font-semibold">✅ Còn hàng</p>

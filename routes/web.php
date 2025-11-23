@@ -83,27 +83,30 @@ Route::get('logout', [AuthController::class,'logout'])->name('auth.logout');
 
 Route::get('/home', [ProductClientController::class, 'index'])->name('client.home')->middleware('auth');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/details/{id}', [ProductClientController::class, 'details'])->name('product.details');
+    // CLIENT CART
+    Route::post('/cart/add/{id}', [CartCLientController::class, 'add'])->name('cart.add');
+    // Hiển thị giỏ hàng
+    Route::get('/cart', [CartClientController::class, 'index'])->name('cart.index');
 
+    // Cập nhật số lượng
+    Route::post('/cart/update', [CartClientController::class, 'update'])->name('cart.update');
+
+    // Xóa sản phẩm khỏi giỏ
+    Route::get('/cart/remove/{id}', [CartClientController::class, 'remove'])->name('cart.remove');
+});
 
 // CLIENT PRODUCT 
 Route::get('/find', [ProductClientController::class, 'find'])->name('client.products.index');
 Route::get('/top-sale', [ProductClientController::class, 'topSale'])->name('top.sale');
-Route::get('/details/{id}', [ProductClientController::class, 'details'])->name('product.details');
+
 Route::get('/buy/{id}', [ProductClientController::class, 'buy'])->name('product.buy');
 Route::post('/buy/{id}', [ProductClientController::class, 'processBuy'])->name('product.processBuy');
 
 
 
-// CLIENT CART
-Route::post('/cart/add/{id}', [CartCLientController::class, 'add'])->name('cart.add');
-// Hiển thị giỏ hàng
-Route::get('/cart', [CartClientController::class, 'index'])->name('cart.index');
 
-// Cập nhật số lượng
-Route::post('/cart/update', [CartClientController::class, 'update'])->name('cart.update');
-
-// Xóa sản phẩm khỏi giỏ
-Route::get('/cart/remove/{id}', [CartClientController::class, 'remove'])->name('cart.remove');
 
 // Xử lí mua hàng
 Route::get('/buy-cart', [CartClientController::class, 'buyCart'])->name('cart.buy');

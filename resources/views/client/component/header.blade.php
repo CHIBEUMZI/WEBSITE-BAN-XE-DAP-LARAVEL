@@ -87,7 +87,7 @@
   <!-- Avatar + Dropdown -->
   <div class="relative">
     <button id="userMenuButton" class="flex items-center gap-2 focus:outline-none">
-      <img src="{{ Auth::user()->image ? asset('storage/' . Auth::user()->image) : asset('images/Avatar/default.jpg') }}"
+      <img src="{{ Auth::user() && Auth::user()->image ? asset('storage/' . Auth::user()->image) : asset('images/Avatar/default.jpg') }}"
         alt="Avatar"
         class="w-9 h-9 rounded-full object-cover border-2 border-white shadow" />
       <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
