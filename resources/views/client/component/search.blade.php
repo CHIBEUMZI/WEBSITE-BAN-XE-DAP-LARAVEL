@@ -3,7 +3,7 @@
 @section('content')
 @if(isset($products))
     @if($products->isEmpty())
-        <p class="text-center py-12 text-gray-500 text-lg">Không tìm thấy sản phẩm nào.</p>
+        <p class="text-center py-12 text-gray-500 text-lg" id="noProductsMessage">Không tìm thấy sản phẩm nào.</p>
     @else
         <section class="py-12 bg-gray-100">
             <div class="max-w-7xl mx-auto px-4">
@@ -21,7 +21,7 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     @foreach ($products as $product)
-                        <div class="relative bg-white p-4 rounded-xl shadow-sm group hover:shadow-lg hover:scale-105 transform transition duration-300 text-center flex flex-col justify-between h-full">
+                        <div class="relative bg-white p-4 rounded-xl shadow-sm group hover:shadow-lg hover:scale-105 transform transition duration-300 text-center flex flex-col justify-between h-full product-item">
                             {{-- Ribbon SALE --}}
                             @if($product->discount > 0)
                                 <div class="absolute top-0 left-0 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-br-lg z-10">

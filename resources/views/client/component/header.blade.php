@@ -54,7 +54,8 @@
           <option value="Xe đạp fixed gear" {{ request('category') === 'Xe đạp fixed gear' ? 'selected' : '' }}>Xe đạp fixed gear</option>
         </select> --}}
 
-        <input type="search" name="search" value="{{ request('search') }}" class="search-input" placeholder="Tìm kiếm sản phẩm...">
+        <input type="search" name="search" id="searchInput" value="{{ request('search') }}" class="search-input" placeholder="Tìm kiếm sản phẩm..." aria-describedby="searchError">
+        <div id="searchError" class="text-red-500 text-sm" style="display:none;">&nbsp;</div>
         <button type="submit" class="search-button">
           <i class="fas fa-search"></i>
         </button>
@@ -150,6 +151,61 @@
       }, 200);
     }
   });
+
+  // Search input validation
+  (function() {
+    const form = document.querySelector('form[role="search"]');
+    const input = document.getElementById('searchInput');
+    const errorEl = document.getElementById('searchError');
+
+    if (!form || !input || !errorEl) return;
+
+    form.addEventListener('submit', function(e) {
+      const value = input.value.trim();
+      // Reset
+      errorEl.style.display = 'none';
+      errorEl.textContent = '';
+
+      if (value.length === 0) {
+        e.preventDefault();
+        errorEl.textContent = 'Từ khóa không được để trống';
+        errorEl.style.display = 'block';
+        input.focus();
+        return;
+      }
+
+      // If input contains no letters or digits (only special characters), reject
+      // Uses Unicode property escapes to allow letters in many languages.
+      try {
+        const hasLetterOrDigit = /[\p{L}\p{N}]/u.test(value);
+        if (!hasLetterOrDigit) {
+          e.preventDefault();
+          errorEl.textContent = 'Từ khóa không hợp lệ';
+          errorEl.style.display = 'block';
+          input.focus();
+          return;
+        }
+      } catch (err) {
+        // Fallback for older browsers without Unicode property escapes
+        const fallbackHasAlnum = /[A-Za-z0-9]/.test(value);
+        if (!fallbackHasAlnum) {
+          e.preventDefault();
+          errorEl.textContent = 'Từ khóa không hợp lệ';
+          errorEl.style.display = 'block';
+          input.focus();
+          return;
+        }
+      }
+
+      if (value.length > 50) {
+        e.preventDefault();
+        errorEl.textContent = 'Từ khóa quá dài';
+        errorEl.style.display = 'block';
+        input.focus();
+        return;
+      }
+    });
+  })();
 </script>
 
 
