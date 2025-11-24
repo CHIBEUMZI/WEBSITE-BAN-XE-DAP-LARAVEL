@@ -17,23 +17,41 @@ class CartClientController extends Controller
     public function add(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $quantity = $request->input('quantity', 1);
+        $userId = Auth::id();
+        $quantity = (int) $request->input('quantity', 1);
 
-        $cartItem = Cart::where('user_id', Auth::id())->where('product_id', $id)->first();
+        if ($quantity < 1) {
+            return redirect()->back()->with('error', 'Số lượng phải lớn hơn 0.');
+        }
+
+        $cartItem = Cart::where('user_id', $userId)
+                        ->where('product_id', $product->id)
+                        ->first();
+
+        $currentQuantity = $cartItem ? $cartItem->quantity : 0;
+        $newQuantity = $currentQuantity + $quantity;
+
+        if ($newQuantity > $product->stock) {
+            return redirect()->back()->with(
+                'error',
+                'Số lượng trong kho không đủ. Hiện còn ' . $product->stock . ' sản phẩm.'
+            );
+        }
 
         if ($cartItem) {
-            $cartItem->quantity += $quantity;
+            $cartItem->quantity = $newQuantity;
             $cartItem->save();
         } else {
             Cart::create([
-                'user_id' => Auth::id(),
-                'product_id' => $id,
-                'quantity' => $quantity,
+                'user_id'    => $userId,
+                'product_id' => $product->id,
+                'quantity'   => $quantity,
             ]);
         }
 
         return redirect()->back()->with('success', 'Đã thêm sản phẩm vào giỏ hàng!');
     }
+
 
     public function index()
     {
