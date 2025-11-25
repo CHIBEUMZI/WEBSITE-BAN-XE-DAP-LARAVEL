@@ -15,7 +15,6 @@ class Employee extends Model
         'address',
         'image',
     ];
-    
     public function maintenances()
     {
         return $this->hasMany(Maintenance::class);

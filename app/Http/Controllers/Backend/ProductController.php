@@ -30,14 +30,14 @@ class ProductController extends Controller
     {
         // Validate dữ liệu đầu vào
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|min:3|max:255',
             'category' => 'required|string|max:255',
             'original_price' => 'required|integer|min:0',
-            'price' => 'required|integer|min:0',
+            'price' => 'required|integer|min:0|lte:original_price',
             'stock' => 'required|integer|min:0',
             'brand' => 'required|string|max:255',
             'sku' => 'required|string|max:255',
-            'discount' => 'nullable|string|max:255',
+            'discount' => 'nullable|integer|min:0|max:100',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
         ]);
