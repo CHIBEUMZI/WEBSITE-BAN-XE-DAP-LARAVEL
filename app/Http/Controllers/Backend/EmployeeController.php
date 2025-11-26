@@ -32,7 +32,7 @@ class EmployeeController extends Controller
         // Validate dữ liệu đầu vào
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'phone' => 'required|string|max:255',
+            'phone'     => 'required|regex:/^[0-9]{10}$/',
             'position' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
