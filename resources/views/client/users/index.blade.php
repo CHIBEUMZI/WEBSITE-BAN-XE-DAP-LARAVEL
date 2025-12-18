@@ -25,18 +25,27 @@
     <div class="md:col-span-2 space-y-4">
       <div>
         <label class="block font-semibold">Tên</label>
-        <input type="text" name="name" value="{{ $user->name }}" class="w-full p-2 border rounded" />
+        <input type="text" name="name" value="{{ $user->name }}" class="w-full p-2 border rounded" required oninvalid="this.setCustomValidity('Vui lòng nhập tên của bạn')" oninput="this.setCustomValidity('')" />
       </div>
 
       <div>
         <label class="block font-semibold">Email</label>
-        <input type="email" name="email" value="{{ $user->email }}" class="w-full p-2 border rounded" />
+        <input type="email" name="email" value="{{ $user->email }}" class="w-full p-2 border rounded" required oninvalid="this.setCustomValidity('Email không đúng định dạng (thiếu @...)')" oninput="this.setCustomValidity('')" />
       </div>
 
       <div>
         <label class="block font-semibold">Số điện thoại</label>
-        <input type="text" name="phone" value="{{ $user->phone }}" placeholder="Nhập số điện thoại" class="w-full p-2 border rounded" />
+        <input type="text" 
+               name="phone" 
+               value="{{ $user->phone }}" 
+               placeholder="Nhập số điện thoại" 
+               class="w-full p-2 border rounded" 
+               required 
+               pattern="[0-9]+" 
+               oninvalid="this.setCustomValidity('Số điện thoại không được chứa chữ và không được để trống!')" 
+               oninput="this.setCustomValidity('')" />
       </div>
+      
       <div>
         <label class="block font-semibold">Sinh nhật</label>
         <div class="flex gap-4 mt-2">
@@ -60,7 +69,13 @@
 
       <div>
         <label class="block font-semibold">Địa chỉ</label>
-        <textarea name="address" rows="3" class="w-full p-2 border rounded" placeholder="Nhập địa chỉ">{{ $user->address }}</textarea>
+        <textarea name="address" 
+                  rows="3" 
+                  class="w-full p-2 border rounded" 
+                  placeholder="Nhập địa chỉ" 
+                  required 
+                  oninvalid="this.setCustomValidity('Vui lòng nhập địa chỉ của bạn!')" 
+                  oninput="this.setCustomValidity('')">{{ $user->address }}</textarea>
       </div>
 
       <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Lưu thay đổi</button>
