@@ -30,13 +30,19 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         // Validate dữ liệu đầu vào
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone'     => 'required|regex:/^[0-9]{10}$/',
-            'position' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
-        ]);
+        $validated = $request->validate(
+            [
+                'name'     => 'required|string|min:3|max:50',
+                'phone'    => 'required|regex:/^[0-9]{10}$/|unique:employees,phone',
+                'position' => 'required|string|max:255',
+                'address'  => 'required|string|max:255',
+                'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ],
+            [
+                'phone.unique' => 'Số điện thoại này đã tồn tại trong hệ thống.',
+                'phone.regex'  => 'Số điện thoại phải gồm đúng 10 chữ số.',
+            ]
+        );
     
         // Lưu ảnh nếu có
         $imagePath = null;
