@@ -45,11 +45,13 @@
 
               <!-- Mật khẩu mới -->
               <div class="mb-3">
-                <label for="password" class="form-label"> Mật khẩu mới:</label>
-                <input type="password" id="password" name="password" class="form-control" required placeholder="Nhập mật khẩu mới">
-                @error('password')
-                  <div class="error-message">{{ $message }}</div>
-                @enderror
+                <label for="password" class="form-label">Mật khẩu mới:</label>
+                <input type="password" id="password" name="password"
+                      class="form-control" required placeholder="Nhập mật khẩu mới">
+
+                @if(isset($errors) && $errors->has('password'))
+                  <div class="error-message">{{ $errors->first('password') }}</div>
+                @endif
               </div>
 
               <!-- Nhập lại mật khẩu -->

@@ -46,19 +46,23 @@
             <!-- Email -->
             <div class="mb-3">
               <label for="email" class="form-label">Email:</label>
-              <input type="email" id="email" name="email" class="form-control" required placeholder="Nhập email của bạn" value="{{ old('email') }}">
-              @error('email')
-              <div class="error-message">{{ $message }}</div>
-              @enderror
+              <input type="email" id="email" name="email" class="form-control"
+                    required placeholder="Nhập email của bạn" value="{{ old('email') }}">
+
+              @if(isset($errors) && $errors->has('email'))
+                <div class="error-message">{{ $errors->first('email') }}</div>
+              @endif
             </div>
 
             <!-- Số điện thoại -->
             <div class="mb-3">
               <label for="phone" class="form-label">Số điện thoại:</label>
-              <input type="text" id="phone" name="phone" class="form-control" required placeholder="Nhập số điện thoại" value="{{ old('phone') }}">
-              @error('phone')
-              <div class="error-message">{{ $message }}</div>
-              @enderror
+              <input type="text" id="phone" name="phone" class="form-control"
+                    required placeholder="Nhập số điện thoại" value="{{ old('phone') }}">
+
+              @if(isset($errors) && $errors->has('phone'))
+                <div class="error-message">{{ $errors->first('phone') }}</div>
+              @endif
             </div>
 
             <!-- Nút xác nhận -->

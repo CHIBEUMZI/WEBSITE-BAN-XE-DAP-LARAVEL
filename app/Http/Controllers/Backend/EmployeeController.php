@@ -29,7 +29,6 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        // Validate dữ liệu đầu vào
         $validated = $request->validate(
             [
                 'name'     => 'required|string|min:3|max:50',
@@ -43,11 +42,8 @@ class EmployeeController extends Controller
                 'phone.regex'  => 'Số điện thoại phải gồm đúng 10 chữ số.',
             ]
         );
-    
-        // Lưu ảnh nếu có
         $imagePath = null;
         if ($request->hasFile('image')) {
-            // Nếu người dùng tải lên ảnh, lưu vào thư mục 'public/images/employees'
             $imagePath = $request->file('image')->store('images/employees', 'public');
         }
     
@@ -60,8 +56,6 @@ class EmployeeController extends Controller
             'created_at' => now(), 
             'updated_at' => now(), 
         ]);
-    
-        // Chuyển hướng về trang danh sách sản phẩm với thông báo thành công
         return redirect()->route('employees.index')->with('success', 'Nhân viên đã được thêm!');
     }
     
