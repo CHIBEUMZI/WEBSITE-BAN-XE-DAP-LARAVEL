@@ -29,19 +29,21 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        // Validate dữ liệu đầu vào
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone'     => 'required|regex:/^[0-9]{10}$/',
-            'position' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
-        ]);
-    
-        // Lưu ảnh nếu có
+        $validated = $request->validate(
+            [
+                'name'     => 'required|string|min:3|max:50',
+                'phone'    => 'required|regex:/^[0-9]{10}$/|unique:employees,phone',
+                'position' => 'required|string|max:255',
+                'address'  => 'required|string|max:255',
+                'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ],
+            [
+                'phone.unique' => 'Số điện thoại này đã tồn tại trong hệ thống.',
+                'phone.regex'  => 'Số điện thoại phải gồm đúng 10 chữ số.',
+            ]
+        );
         $imagePath = null;
         if ($request->hasFile('image')) {
-            // Nếu người dùng tải lên ảnh, lưu vào thư mục 'public/images/employees'
             $imagePath = $request->file('image')->store('images/employees', 'public');
         }
     
@@ -54,8 +56,6 @@ class EmployeeController extends Controller
             'created_at' => now(), 
             'updated_at' => now(), 
         ]);
-    
-        // Chuyển hướng về trang danh sách sản phẩm với thông báo thành công
         return redirect()->route('employees.index')->with('success', 'Nhân viên đã được thêm!');
     }
     

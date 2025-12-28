@@ -28,7 +28,6 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // Validate dữ liệu đầu vào
         $validated = $request->validate([
             'name' => 'required|string|min:3|max:255',
             'category' => 'required|string|max:255',
@@ -41,12 +40,10 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
         ]);
-
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images/products', 'public');
         }
-
         Product::create([
             'name' => $validated['name'],
             'category' => $validated['category'],
@@ -59,9 +56,6 @@ class ProductController extends Controller
             'description' => $validated['description'] ?? '',
             'image' => $imagePath,
         ]);
-
-    
-        // Chuyển hướng về trang danh sách sản phẩm với thông báo thành công
         return redirect()->route('products.index')->with('success', 'Sản phẩm đã được thêm!');
     }
     
