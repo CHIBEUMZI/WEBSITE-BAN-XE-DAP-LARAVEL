@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Client\ProductClientController;
 use App\Models\Product;
 
-class ProductClientControllerTest extends TestCase
+class SearchProductTest extends TestCase
 {
     /**
      * TC1: Không search, không category
