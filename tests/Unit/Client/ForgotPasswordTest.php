@@ -9,7 +9,6 @@ use App\Models\User;
 
 class ForgotPasswordTest extends TestCase
 {
-    use RefreshDatabase;
 
     protected function setUp(): void
     {

@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class EmployeeStoreTest extends TestCase
 {
-    use RefreshDatabase;
 
     protected function setUp(): void
     {

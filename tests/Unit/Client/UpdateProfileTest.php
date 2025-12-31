@@ -8,7 +8,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UpdateProfileTest extends TestCase
 {
-    use RefreshDatabase;
 
     /** TC1 – Cập nhật thành công */
     public function test_TC1_update_profile_success()

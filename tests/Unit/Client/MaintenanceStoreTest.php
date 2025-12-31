@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class MaintenanceStoreTest extends TestCase
 {
-    use RefreshDatabase;
 
     protected function setUp(): void
     {

@@ -9,7 +9,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProductStoreTest extends TestCase
 {
-    use RefreshDatabase;
 
     protected function setUp(): void
     {
