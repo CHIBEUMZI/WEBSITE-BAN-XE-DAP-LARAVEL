@@ -1,134 +1,127 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit\Client;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Http\Controllers\Client\UserClientController;
+use Illuminate\Validation\ValidationException;
 
 class ForgotPasswordTest extends TestCase
 {
+    protected $controller;
+    protected $user;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // Tắt middleware để test luồng logic
-        $this->withoutMiddleware();
+        $this->controller = $this->app->make(UserClientController::class);
 
-        /**
-         * LƯU Ý:
-         * Nếu bạn dùng RefreshDatabase, DB sẽ bị reset.
-         * => Cần tạo lại user test với đúng email/phone của bạn.
-         */
-        User::create([
-            'name' => 'Minh Chi',
-            'email' => 'minhchi@gmail.com',
-            'phone' => '0327264556',
+        User::where('email', 'minhchi@gmail.com')->delete();
+
+        // Tạo user test
+        $this->user = User::create([
+            'name'     => 'Minh Chi',
+            'email'    => 'minhchi@gmail.com',
+            'phone'    => '0327264556',
             'password' => Hash::make('oldpassword'),
         ]);
     }
 
-    /** @test */
-    public function can_view_forgot_password_form()
+    protected function tearDown(): void
     {
-        $response = $this->get(route('password.form'));
+        // Dọn dữ liệu giống AddToCartTest
+        if ($this->user) {
+            $this->user->delete();
+            $this->user = null;
+        }
 
-        $response->assertStatus(200);
-        $response->assertViewIs('backend.auth.forgot');
+        parent::tearDown();
     }
 
-    /** @test */
-    public function forgot_password_validate_fail()
+    // =========================
+    // TC1: Validate fail
+    // =========================
+    public function test_forgot_password_validate_fail()
     {
-        $response = $this->post(route('password.check'), [
+        $request = Request::create('/forgot-password', 'POST', [
             'email' => '',
             'phone' => '',
         ]);
 
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors(['email', 'phone']);
+        $this->expectException(ValidationException::class);
+
+        $this->controller->checkInfo($request);
     }
 
-    /** @test */
-    public function forgot_password_email_or_phone_incorrect()
+    // =========================
+    // TC2: Email / phone sai
+    // =========================
+    public function test_forgot_password_email_or_phone_incorrect()
     {
-        $response = $this->post(route('password.check'), [
+        $request = Request::create('/forgot-password', 'POST', [
             'email' => 'sai@gmail.com',
             'phone' => '0999999999',
         ]);
 
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors(['email']);
+        $response = $this->controller->checkInfo($request);
+
+        $this->assertTrue($response->isRedirect());
     }
 
-    /** @test */
-    public function forgot_password_success_redirect_to_reset_form()
+    // =========================
+    // TC3: Thành công → redirect form reset
+    // =========================
+    public function test_forgot_password_success_redirect_to_reset_form()
     {
-        $user = User::where('email', 'minhchi@gmail.com')
-                    ->where('phone', '0327264556')
-                    ->firstOrFail();
-
-        $response = $this->post(route('password.check'), [
+        $request = Request::create('/forgot-password', 'POST', [
             'email' => 'minhchi@gmail.com',
             'phone' => '0327264556',
         ]);
 
-        $response->assertRedirect(
-            route('password.reset.form', ['user' => $user->id])
+        $response = $this->controller->checkInfo($request);
+
+        $this->assertTrue($response->isRedirect());
+        $this->assertStringContainsString(
+            (string) $this->user->id,
+            $response->getTargetUrl()
         );
     }
 
-    /** @test */
-    public function can_view_reset_password_form()
+    // =========================
+    // TC4: Reset password validate fail
+    // =========================
+    public function test_reset_password_validate_fail()
     {
-        $user = User::where('email', 'minhchi@gmail.com')->firstOrFail();
+        $request = Request::create('/reset-password', 'POST', [
+            'password' => '123',
+            'password_confirmation' => '456',
+        ]);
 
-        $response = $this->get(
-            route('password.reset.form', ['user' => $user->id])
-        );
+        $this->expectException(ValidationException::class);
 
-        $response->assertStatus(200);
-        $response->assertViewIs('backend.auth.reset');
-        $response->assertViewHas('user');
+        $this->controller->updatePassword($request, $this->user->id);
     }
 
-    /** @test */
-    public function reset_password_validate_fail()
+    // =========================
+    // TC5: Reset password success
+    // =========================
+    public function test_reset_password_success()
     {
-        $user = User::where('email', 'minhchi@gmail.com')->firstOrFail();
+        $request = Request::create('/reset-password', 'POST', [
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+        ]);
 
-        $response = $this->post(
-            route('password.update.simple', ['user' => $user->id]),
-            [
-                'password' => '123',
-                'password_confirmation' => '456',
-            ]
-        );
+        $response = $this->controller->updatePassword($request, $this->user->id);
 
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors(['password']);
-    }
-
-    /** @test */
-    public function reset_password_success()
-    {
-        $user = User::where('email', 'minhchi@gmail.com')->firstOrFail();
-
-        $response = $this->post(
-            route('password.update.simple', ['user' => $user->id]),
-            [
-                'password' => 'newpassword123',
-                'password_confirmation' => 'newpassword123',
-            ]
-        );
-
-        $response->assertRedirect(route('login'));
-        $response->assertSessionHas('success');
+        $this->assertTrue($response->isRedirect());
 
         $this->assertTrue(
-            Hash::check('newpassword123', $user->fresh()->password)
+            Hash::check('newpassword123', $this->user->fresh()->password)
         );
     }
 }

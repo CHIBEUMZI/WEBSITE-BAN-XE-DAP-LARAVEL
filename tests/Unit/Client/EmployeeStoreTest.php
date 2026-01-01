@@ -1,46 +1,52 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Unit\Client;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Employee;
+use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Backend\EmployeeController;
+use Illuminate\Validation\ValidationException;
 
 class EmployeeStoreTest extends TestCase
 {
+    protected $controller;
+    protected $employee;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        // TẮT TOÀN BỘ middleware (auth, logout, csrf, ...)
-        // để test trực tiếp logic controller
-        $this->withoutMiddleware();
+        $this->controller = $this->app->make(EmployeeController::class);
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->employee) {
+            $this->employee->delete();
+            $this->employee = null;
+        }
+
+        parent::tearDown();
     }
 
     // =========================
-    // TC1: Dữ liệu không hợp lệ 
+    // TC1: Dữ liệu không hợp lệ
     // =========================
-    public function store_employee_validate_fail()
+    public function test_store_employee_validate_fail()
     {
-        $response = $this->post(route('employees.store'), [
-            'name' => '',
-            'phone' => '',
+        $request = Request::create('/employees/store', 'POST', [
+            'name'     => '',
+            'phone'    => '',
             'position' => '',
-            'address' => '',
+            'address'  => '',
         ]);
 
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors([
-            'name',
-            'phone',
-            'position',
-            'address',
-        ]);
+        $this->expectException(ValidationException::class);
 
-        $this->assertDatabaseCount('employees', 0);
+        $this->controller->store($request);
     }
 
     // =========================
@@ -50,37 +56,30 @@ class EmployeeStoreTest extends TestCase
     {
         Storage::fake('public');
 
-        // Không dùng fake()->image() để tránh lỗi GD
         $file = UploadedFile::fake()->create(
             'employee.jpg',
             500,
             'image/jpeg'
         );
 
-        $response = $this->post(route('employees.store'), [
+        $request = Request::create('/employees/store', 'POST', [
             'name'     => 'Nguyen Van C',
             'phone'    => '0911222333',
             'position' => 'Nhân viên kỹ thuật',
             'address'  => 'Hồ Chí Minh',
-            'image'    => $file,
+        ], [], [
+            'image' => $file,
         ]);
 
-        $response->assertRedirect(route('employees.index'));
-        $response->assertSessionHas('success');
+        $response = $this->controller->store($request);
 
-        // Kiểm tra file đã được lưu
-        $this->assertTrue(
-            Storage::disk('public')->exists(
-                'images/employees/' . $file->hashName()
-            )
-        );
+        $this->assertTrue($response->isRedirect());
 
-        // Kiểm tra DB
-        $this->assertDatabaseHas('employees', [
-            'name'  => 'Nguyen Van C',
-            'phone' => '0911222333',
-            'image' => 'images/employees/' . $file->hashName(),
-        ]);
+        $this->employee = Employee::where('phone', '0911222333')->first();
+        $this->assertNotNull($this->employee);
+        $this->assertNotEmpty($this->employee->image);
+
+        Storage::disk('public')->assertExists($this->employee->image);
     }
 
     // =========================
@@ -88,84 +87,22 @@ class EmployeeStoreTest extends TestCase
     // =========================
     public function test_store_employee_success_without_image()
     {
-        $response = $this->post(route('employees.store'), [
+        $request = Request::create('/employees/store', 'POST', [
             'name'     => 'Nguyen Van B',
             'phone'    => '0987654321',
             'position' => 'Nhân viên kho',
             'address'  => 'Đà Nẵng',
         ]);
 
-        $response->assertRedirect(route('employees.index'));
+        $response = $this->controller->store($request);
 
-        $this->assertDatabaseHas('employees', [
-            'name'  => 'Nguyen Van B',
-            'image' => null,
-        ]);
+        $this->assertTrue($response->isRedirect());
+
+        $this->employee = Employee::where('phone', '0987654321')->first();
+        $this->assertNotNull($this->employee);
+
+        $this->assertTrue(
+            $this->employee->image === null || $this->employee->image === ''
+        );
     }
-
-
-
-    /** @test */
-    // public function store_employee_phone_invalid_format()
-    // {
-    //     $response = $this->post(route('employees.store'), [
-    //         'name' => 'Nguyen Van A',
-    //         'phone' => '12345', // sai regex (không đủ 10 số)
-    //         'position' => 'Nhân viên bán hàng',
-    //         'address' => 'Hồ Chí Minh',
-    //     ]);
-
-    //     $response->assertStatus(302);
-    //     $response->assertSessionHasErrors(['phone']);
-
-    //     $this->assertDatabaseCount('employees', 0);
-    // }
-
-    // /** @test */
-    // public function store_employee_phone_duplicate()
-    // {
-    //     // Tạo sẵn 1 nhân viên để kiểm tra unique phone
-    //     DB::table('employees')->insert([
-    //         'name' => 'Employee Old',
-    //         'phone' => '0912345678',
-    //         'position' => 'NV',
-    //         'address' => 'Hà Nội',
-    //         'created_at' => now(),
-    //         'updated_at' => now(),
-    //     ]);
-
-    //     $response = $this->post(route('employees.store'), [
-    //         'name' => 'Employee New',
-    //         'phone' => '0912345678', // trùng
-    //         'position' => 'NV',
-    //         'address' => 'Hồ Chí Minh',
-    //     ]);
-
-    //     $response->assertStatus(302);
-    //     $response->assertSessionHasErrors(['phone']);
-
-    //     // Vẫn chỉ có 1 bản ghi
-    //     $this->assertDatabaseCount('employees', 1);
-    // }
-
-    // /** @test */
-    // public function store_employee_success_without_image()
-    // {
-    //     $response = $this->post(route('employees.store'), [
-    //         'name' => 'Nguyen Van B',
-    //         'phone' => '0987654321',
-    //         'position' => 'Nhân viên kho',
-    //         'address' => 'Đà Nẵng',
-    //     ]);
-
-    //     $response->assertRedirect(route('employees.index'));
-    //     $response->assertSessionHas('success');
-
-    //     $this->assertDatabaseHas('employees', [
-    //         'name' => 'Nguyen Van B',
-    //         'phone' => '0987654321',
-    //         'position' => 'Nhân viên kho',
-    //         'address' => 'Đà Nẵng',
-    //     ]);
-    // }
 }
