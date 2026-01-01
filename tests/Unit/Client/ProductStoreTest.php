@@ -93,11 +93,7 @@ class ProductStoreTest extends TestCase
     {
         Storage::fake('public');
 
-        $file = UploadedFile::fake()->create(
-            'product.jpg',
-            500,
-            'image/jpeg'
-        );
+        $file = UploadedFile::fake()->image('avatar.jpg');
 
         $request = Request::create('/products/store', 'POST', [
             'name' => 'Xe đạp địa hình',
@@ -119,6 +115,7 @@ class ProductStoreTest extends TestCase
         $this->assertNotNull($this->product);
         $this->assertNotEmpty($this->product->image);
 
-        Storage::disk('public')->assertExists($this->product->image);
+        Storage::disk('public')
+            ->assertExists('images/products/' . $file->hashName());
     }
 }
