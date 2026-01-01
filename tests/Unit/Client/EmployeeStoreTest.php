@@ -55,6 +55,7 @@ class EmployeeStoreTest extends TestCase
     public function test_store_employee_with_image()
     {
         Storage::fake('public');
+        $phone = fake()->regexify("0[0-9]{9}");
 
         $file = UploadedFile::fake()->create(
             'employee.jpg',
@@ -64,7 +65,7 @@ class EmployeeStoreTest extends TestCase
 
         $request = Request::create('/employees/store', 'POST', [
             'name'     => 'Nguyen Van C',
-            'phone'    => '0911222333',
+            'phone'    => $phone,
             'position' => 'Nhân viên kỹ thuật',
             'address'  => 'Hồ Chí Minh',
         ], [], [
@@ -75,7 +76,7 @@ class EmployeeStoreTest extends TestCase
 
         $this->assertTrue($response->isRedirect());
 
-        $this->employee = Employee::where('phone', '0911222333')->first();
+        $this->employee = Employee::where('phone', $phone)->first();
         $this->assertNotNull($this->employee);
         $this->assertNotEmpty($this->employee->image);
 
@@ -87,9 +88,10 @@ class EmployeeStoreTest extends TestCase
     // =========================
     public function test_store_employee_success_without_image()
     {
+        $phone = fake()->regexify("0[0-9]{9}");
         $request = Request::create('/employees/store', 'POST', [
             'name'     => 'Nguyen Van B',
-            'phone'    => '0987654321',
+            'phone'    => $phone,
             'position' => 'Nhân viên kho',
             'address'  => 'Đà Nẵng',
         ]);
@@ -98,7 +100,7 @@ class EmployeeStoreTest extends TestCase
 
         $this->assertTrue($response->isRedirect());
 
-        $this->employee = Employee::where('phone', '0987654321')->first();
+        $this->employee = Employee::where('phone', $phone)->first();
         $this->assertNotNull($this->employee);
 
         $this->assertTrue(
