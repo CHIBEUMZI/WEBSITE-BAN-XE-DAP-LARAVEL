@@ -14,11 +14,13 @@
 </div>
 
 <!-- Thêm mới -->
+ <button>
 <a href="{{ route('employees.create') }}"
+    id="add_employee_btn"
     class="inline-block mb-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition">
     ➕ Thêm nhân viên
 </a>
-
+</button
 <!-- Bảng nhân viên -->
 <div class="overflow-x-auto bg-white shadow rounded-xl">
     <table class="min-w-full divide-y divide-gray-200 text-sm">
